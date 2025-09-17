@@ -15,7 +15,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
     private final String SECRET = "Our OFSS Training project is Banking@";
-    private final long EXPIRATION = 1000 * 60;
+    private final long EXPIRATION = 1000 * 60*60;
     private final Key secretkey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
     public String generateTokenWithRole(String email, String role) {

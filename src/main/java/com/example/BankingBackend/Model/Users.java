@@ -1,46 +1,60 @@
 
 package com.example.BankingBackend.Model;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-
 @Entity
-@Table(name = "USERS")
-@Data
+@Table(name = "users")
 @Getter
 @Setter
-
+@NoArgsConstructor
+@AllArgsConstructor
 public class Users {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "users_seq_gen")
+    @SequenceGenerator(name = "users_seq_gen", sequenceName = "users_seq", allocationSize = 1)
+    private int userId;
 
 
-       @Id
-       @GeneratedValue(strategy = GenerationType.IDENTITY)
-       @Column(name="USER_ID")
-        private int userId;
+    @Column(nullable = false, unique = true, length = 150)
+    private String email;
 
-        @Column(name="FULL_NAME")
-        private String fullName;
-        @Column(name = "EMAIL", nullable = false, unique = true)
-        private String email;
-        @Column(name = "PASSWORD", nullable = false)
-        private String password;
-        @Column(name = "ROLE", nullable = false)
-        private String role = "USER";
+    @Column(nullable = false, length = 100)
+    private String firstName;
 
-    public Users(String fullName, String email, String password, String role) {
-        this.fullName = fullName;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
+    @Column(nullable = false, length = 100)
+    private String lastName;
 
-    public Users() {
+    @Column(nullable = false, length = 15)
+    private String phone;
 
-    }
+    @Column(nullable = false, unique = true, length = 12)
+    private String aadhaarNumber;
+
+    @Column(nullable = false, unique = true, length = 10)
+    private String panNumber;
+
+    @Column(nullable = false, length = 100)
+    private String accountType;
+
+    @Column(length = 100)
+    private String occupation;
+
+    @Column(name = "annual_income")
+    private Double annualIncome;
+
+    @Column(nullable = false, length = 255)
+    private String password; // generated password
+
+    @Column(length = 20)
+    private String status; // APPROVED
 }
+
 
 
 
