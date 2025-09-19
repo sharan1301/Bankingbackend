@@ -1,19 +1,21 @@
 package com.example.BankingBackend.Model;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "ACCOUNTS")
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
@@ -37,6 +39,9 @@ public class Account {
 
     @Column(name = "BALANCE", precision = 15, scale = 2)
     private Double balance;
+
+    @Column(name="PIN" , length = 10)
+    private String pin;
 
     @Column(name = "BRANCH_CODE", length = 10)
     private String branchCode;
@@ -87,6 +92,6 @@ public class Account {
     }
 
     public enum AccountStatus {
-        ACTIVE, INACTIVE, SUSPENDED, CLOSED, FROZEN
+        ACTIVE, CLOSED, FROZEN
     }
 }

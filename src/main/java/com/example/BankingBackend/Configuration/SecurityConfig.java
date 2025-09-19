@@ -23,7 +23,7 @@ public class SecurityConfig {
                 .authorizeRequests(auth -> auth
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        .antMatchers("/users/**").hasAnyRole("USERS","ADMIN")
+                        .antMatchers("/users/**").hasAnyRole("USER","ADMIN")
                         .antMatchers("/requests/**").permitAll()
                         .anyRequest().authenticated()
                 )

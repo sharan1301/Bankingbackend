@@ -14,9 +14,11 @@ import javax.persistence.*;
 public class Admin {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name="ADMIN_ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "admin_seq")
+    @SequenceGenerator(name = "admin_seq", sequenceName = "ADMIN_SEQ", allocationSize = 1)
+    @Column(name = "ADMIN_ID")
     private int adminId;
+
     @Column(name="FULL_NAME")
     private String fullName;
     @Column(name = "EMAIL", nullable = false, unique = true)

@@ -2,9 +2,8 @@ package com.example.BankingBackend.Controllers;
 
 import com.example.BankingBackend.Model.Admin;
 import com.example.BankingBackend.Model.UserRequests;
-import com.example.BankingBackend.Model.Users;
 import com.example.BankingBackend.Service.AdminService;
-import com.example.BankingBackend.Service.UserRequestsService;
+import com.example.BankingBackend.Service.UserReqServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +17,7 @@ public class AdminController {
     @Autowired
     AdminService adminService;
     @Autowired
-    UserRequestsService userRequestsService;
+    UserReqServiceImpl userRequestsService;
     @GetMapping("/getAdmins")
     public List<Admin> getAdmins(){
             return  adminService.getadmins();
@@ -33,10 +32,14 @@ public class AdminController {
     }
     @PutMapping("/{id}/approve")
     public ResponseEntity<?> approveUser(@PathVariable int id){
-        return userRequestsService.approveUser(id);
+        return adminService.approveUser(id);
     }
     @PutMapping("/{id}/decline")
     public ResponseEntity<?> declineUser(@PathVariable int id){
-        return userRequestsService.declineUser(id);
+        return adminService.declineUser(id);
+    }
+    @GetMapping("/registeredUsers")
+    public List<UserRequests> getRegisteredUsers(){
+        return adminService.getRegisteredUsers();
     }
 }

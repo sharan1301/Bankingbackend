@@ -51,7 +51,7 @@ public class AuthController {
             return new ResponseEntity<>("User not registered",HttpStatus.UNAUTHORIZED);
         }
         Users user=userOptional.get();
-        if(!pwdEncoder.matches(password, user.getPassword())){
+        if(!password.equals(user.getPassword())){
             return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
         }
         String token=jwtUtil.generateTokenWithRole(email,"ROLE_USER");
