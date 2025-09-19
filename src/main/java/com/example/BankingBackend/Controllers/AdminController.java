@@ -4,7 +4,8 @@ import com.example.BankingBackend.Model.Admin;
 import com.example.BankingBackend.Model.UserRequests;
 import com.example.BankingBackend.Model.Users;
 import com.example.BankingBackend.Service.AdminService;
-import com.example.BankingBackend.Service.UserRequestsService;
+import com.example.BankingBackend.Service.UserReqService;
+import com.example.BankingBackend.Service.UserReqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class AdminController {
     @Autowired
     AdminService adminService;
     @Autowired
-    UserRequestsService userRequestsService;
+    UserReqService userRequestsService;
     @GetMapping("/getAdmins")
     public List<Admin> getAdmins(){
             return  adminService.getadmins();
