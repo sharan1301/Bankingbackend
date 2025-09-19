@@ -37,7 +37,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    @Column(name = "BALANCE", precision = 15, scale = 2)
+    @Column(name = "BALANCE", precision = 15)
     private Double balance;
 
     @Column(name="PIN" , length = 10)
@@ -57,7 +57,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountStatus status = AccountStatus.ACTIVE;
 
-    @Column(name = "MINIMUM_BALANCE", precision = 10, scale = 2)
+    @Column(name = "MINIMUM_BALANCE", precision = 10)
     private Double minimumBalance;
 
     @CreationTimestamp

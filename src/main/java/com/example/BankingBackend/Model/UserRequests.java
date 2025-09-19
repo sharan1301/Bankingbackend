@@ -3,8 +3,6 @@ package com.example.BankingBackend.Model;
 import lombok.*;
 
 import javax.persistence.*;
-
-
 import java.time.LocalDate;
 
 @Entity
@@ -49,13 +47,6 @@ public class UserRequests {
     @Column(name = "annual_income")
     private Double annualIncome;
 
-//    @Lob
-//    @Column(name = "aadhaar_pdf")
-//    private byte[] aadhaarPdf;
-//
-//    @Lob
-//    @Column(name = "pan_pdf")
-//    private byte[] panPdf;
 
     @Column(length = 20)
     private String status = "PENDING";
@@ -63,5 +54,7 @@ public class UserRequests {
     @Column(name = "request_date")
     private LocalDate requestDate = LocalDate.now();
 
-
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
