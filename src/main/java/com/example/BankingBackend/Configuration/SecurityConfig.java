@@ -24,7 +24,7 @@ public class SecurityConfig {
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/users/**").hasAnyRole("USER","ADMIN")
-                        .antMatchers("/requests/**").permitAll()
+                        .antMatchers("/user-requests/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

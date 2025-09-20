@@ -1,13 +1,8 @@
 package com.example.BankingBackend.Service;
 
-import com.example.BankingBackend.Model.Account;
-import com.example.BankingBackend.Model.Admin;
-import com.example.BankingBackend.Model.UserRequests;
-import com.example.BankingBackend.Model.Users;
-import com.example.BankingBackend.Repository.AccountRepo;
-import com.example.BankingBackend.Repository.AdminRepo;
-import com.example.BankingBackend.Repository.UserRequestsRepo;
-import com.example.BankingBackend.Repository.UsersRepo;
+import com.example.BankingBackend.Model.*;
+import com.example.BankingBackend.Repository.*;
+import com.example.BankingBackend.Service.Exception.LoanRequestNotFound;
 import com.example.BankingBackend.Service.Exception.UserRequestNotFound;
 import com.example.BankingBackend.utils.AccountNumberGenerator;
 import com.example.BankingBackend.utils.PasswordGenerator;
@@ -19,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -28,12 +24,15 @@ public class AdminService {
     @Autowired
     AdminRepo adminRepo;
     @Autowired
-    UserRequestsRepo userRequestsRepo;
+    UserReqRepo userRequestsRepo;
     @Autowired
     UsersRepo usersRepo;
     @Autowired
     AccountRepo accountRepo;
     @Autowired
+    LoanReqRepo loanReqRepo;
+    @Autowired
+    LoanRepo loanRepo;
     EmailService emailService;
     PasswordEncoder encoder = new BCryptPasswordEncoder(12);
     String subject = "Welcome to Our Bank - Account Created Successfully";
@@ -115,5 +114,55 @@ public class AdminService {
         return ResponseEntity.status(HttpStatus.OK).body("User request declined");
 
 
+    }
+
+    public ResponseEntity<?> approveLoan(Long id) {
+        LoanRequests loanRequest = loanReqRepo.findById(id)
+                .orElseThrow(() -> new LoanRequestNotFound("Loan request not found for id: " + id));
+
+        if (loanRequest.getStatus() != LoanRequests.RequestStatus.PENDING) {
+            throw new IllegalStateException("Loan request is not pending.");
+        }
+
+        Loan loan = new Loan();
+        loan.setUser(loanRequest.getUser());
+        loan.setAccount(loanRequest.getAccount());
+        loan.setLoanType(Loan.LoanType.valueOf(loanRequest.getLoanType().name())); // convert enum
+        loan.setLoanAmount(loanRequest.getLoanAmount());
+        loan.setTenureMonths(loanRequest.getTenureMonths());
+
+        loan.setStartDate(LocalDate.now());
+        loan.setEndDate(LocalDate.now().plusMonths(loan.getTenureMonths()));
+        loan.setInterestRate(10.0); // example
+        loan.setEmi(calculateEmi(loan.getLoanAmount(), loan.getInterestRate(), loan.getTenureMonths()));
+        loan.setStatus(Loan.LoanStatus.ACTIVE);
+
+        Loan savedLoan = loanRepo.save(loan);
+
+        loanRequest.setStatus(LoanRequests.RequestStatus.APPROVED);
+        loanReqRepo.save(loanRequest);
+
+        return ResponseEntity.ok(
+                Map.of("Loan", savedLoan)
+        );
+    }
+    private double calculateEmi(Double principal, Double rate, Integer months) {
+
+        double monthlyRate = rate / 12 / 100;
+        return principal * monthlyRate * Math.pow(1 + monthlyRate, months) / (Math.pow(1 + monthlyRate, months) - 1);
+    }
+
+    public ResponseEntity<?> declineLoan(Long id) {
+        LoanRequests loanReq = loanReqRepo.findById(id)
+                .orElseThrow(() -> new LoanRequestNotFound("Loan request for the id is not found"));
+
+        loanReq.setStatus(LoanRequests.RequestStatus.REJECTED);
+
+        LoanRequests updatedReq = loanReqRepo.save(loanReq);
+        return ResponseEntity.ok(
+                Map.of(
+                        "LoanRequest", updatedReq
+                )
+        );
     }
 }

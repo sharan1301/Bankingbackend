@@ -94,6 +94,7 @@ public class LoanRequests {
     }
 
     public RequestStatus getStatus() {
+
         return status;
     }
 
