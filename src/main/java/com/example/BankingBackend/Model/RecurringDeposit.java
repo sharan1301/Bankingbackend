@@ -2,13 +2,13 @@ package com.example.BankingBackend.Model;
 
 import javax.persistence.*;
 //import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -25,7 +25,17 @@ public class RecurringDeposit {
     @Column(name = "RD_ID", nullable = false, precision = 10)
     private Long rdId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({
+            "fixedDeposits",
+            "recurringDeposits",
+            "transactions",
+            "loans",
+            "cards",
+            "payees",
+            "hibernateLazyInitializer",
+            "handler"
+    })
     @JoinColumn(name = "ACCOUNT_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_RD_ACCOUNT"))
 
     private Account account;
@@ -64,6 +74,9 @@ public class RecurringDeposit {
     @Column(name = "LAST_INSTALLMENT_DATE")
     private LocalDate lastInstallmentDate;
 
+    @Column(name="FINE_IMPOSED", precision = 10, scale = 2)
+    private Double fine = 0.0;
+
     @CreationTimestamp
     @Column(name = "CREATED_AT", updatable = false)
     private LocalDateTime createdAt;
@@ -73,6 +86,6 @@ public class RecurringDeposit {
     private LocalDateTime updatedAt;
 
     public enum DepositStatus {
-        ACTIVE, MATURED, CLOSED, DEFAULTED
+        ACTIVE, MATURED, CLOSED, DEFAULTED,PREMATURE_CLOSURE,PAID_WAIT_MATURE
     }
 }
