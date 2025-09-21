@@ -20,21 +20,24 @@ public class GlobalAccountExceptionHandlers {
     public @ResponseBody ErrorResponse handleAccountDoesNotExistException(UserRequestNotFound ex) {
         return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
-    @ExceptionHandler(value = AccountNotFound.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public @ResponseBody ErrorResponse AccountNotFoundException(AccountNotFound ex) {
-        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-    }
-    @ExceptionHandler(value = LoanRequestNotFound.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public @ResponseBody ErrorResponse LoanRequestNotFound(LoanRequestNotFound ex) {
-        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
-    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String message = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
+    }
+
+    @ExceptionHandler(value = FDAccountAlreadyExists.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public @ResponseBody ErrorResponse handleAccountAlreadyExistsException( FDAccountAlreadyExists ex) {
+        return new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage());
+    }
+
+    @ExceptionHandler(value = FDAccountDoesNotExistException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public @ResponseBody ErrorResponse handleAccountAlreadyExistsException(FDAccountDoesNotExistException ex) {
+        return new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
     }
 
     // ----------------- General Exception -----------------
