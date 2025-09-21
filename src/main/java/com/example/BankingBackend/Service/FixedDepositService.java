@@ -2,7 +2,7 @@ package com.example.BankingBackend.Service;
 
 import com.example.BankingBackend.Model.Account;
 import com.example.BankingBackend.Model.FixedDeposit;
-import com.example.BankingBackend.Repository.AccountRepository;
+import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.FixedDepositRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +18,7 @@ public class FixedDepositService {
     @Autowired
     FixedDepositRepo fdrepo;
     @Autowired
-    AccountRepository accountRepository;
+    AccountRepo accountRepository;
 
     public Iterable<FixedDeposit> fetchAllAccounts(LocalDate date) {
 
