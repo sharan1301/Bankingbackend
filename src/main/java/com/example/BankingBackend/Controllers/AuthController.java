@@ -44,14 +44,14 @@ public class AuthController {
     }
     @PostMapping("/auth/userlogin")
     public ResponseEntity<?> userLogin(@RequestBody LoginRequestUser userrequest){
-        String userName=userrequest.getUserName();
+        String custId=userrequest.getCustId();
         String password=userrequest.getPassword();
-        var userOptional=usersRepo.findByPassword(password);
+        var userOptional=usersRepo.findByCustId(custId);
         if(userOptional.isEmpty()){
             return new ResponseEntity<>("User not registered",HttpStatus.UNAUTHORIZED);
         }
         Users user=userOptional.get();
-        if(!password.equals(user.getPassword())){
+        if(!pwdEncoder.matches(password, user.getPassword())){
             return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
         }
         String token=jwtUtil.generateTokenWithRole(user.getEmail(),"ROLE_USER");
