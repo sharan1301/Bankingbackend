@@ -1,13 +1,11 @@
-package com.example.BankingBackend.Model;
+package org.example.Model;
 
-import javax.persistence.*;
-//import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,20 +21,23 @@ public class Transaction {
     @Column(name = "TRANSACTION_ID", nullable = false, precision = 20)
     private Long transactionId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "SENDER_ACCOUNT_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_TRANSACTION_ACCOUNT"))
 
     private Account account;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "RECEIVER_ACCOUNT_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_TRANSACTION_ACCOUNT"))
 
     private Account recvAcc;
 
     @Column(name = "TRANSACTION_TYPE", nullable = false, length = 50)
-
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;
+
+    @Column(name = "TRANSACTION_MODE", nullable = false, length = 50)
+    @Enumerated(EnumType.STRING)
+    private TransactionMode transactionMode;
 
     @Column(name = "AMOUNT", nullable = false, precision = 15, scale = 2)
 
@@ -65,14 +66,102 @@ public class Transaction {
 
 
     public enum TransactionType {
-        DEBIT, CREDIT, TRANSFER_OUT, TRANSFER_IN, ATM_WITHDRAWAL,
-        FD_OPENING, FD_CLOSURE, RD_INSTALLMENT, LOAN_DISBURSEMENT,
-        LOAN_PAYMENT, INTEREST_CREDIT, CHARGES_DEBIT,NEFT,RTGS,IMPS
+        PAYEE, BANK, TRANSFER, SELF
+    }
+
+    public enum TransactionMode {
+        NEFT, RTGS, IMPS, AUTOPAY
     }
 
     public enum TransactionStatus {
-        PENDING, SUCCESS, FAILED, REVERSED
+        PENDING, SUCCESS, FAILED, INSUFFICIENT_FUNDS, REVERSED
     }
 
+    public Long getTransactionId() {
+        return transactionId;
+    }
 
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public Account getRecvAcc() {
+        return recvAcc;
+    }
+
+    public void setRecvAcc(Account recvAcc) {
+        this.recvAcc = recvAcc;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public TransactionMode getTransactionMode() {
+        return transactionMode;
+    }
+
+    public void setTransactionMode(TransactionMode transactionMode) {
+        this.transactionMode = transactionMode;
+    }
+
+    public Double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(Double amount) {
+        this.amount = amount;
+    }
+
+    public Double getBalanceAfter() {
+        return balanceAfter;
+    }
+
+    public void setBalanceAfter(Double balanceAfter) {
+        this.balanceAfter = balanceAfter;
+    }
+
+    public LocalDateTime getTransactionDate() {
+        return transactionDate;
+    }
+
+    public void setTransactionDate(LocalDateTime transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getReferenceNumber() {
+        return referenceNumber;
+    }
+
+    public void setReferenceNumber(String referenceNumber) {
+        this.referenceNumber = referenceNumber;
+    }
+
+    public TransactionStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TransactionStatus status) {
+        this.status = status;
+    }
 }
