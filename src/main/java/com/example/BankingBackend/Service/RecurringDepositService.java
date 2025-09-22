@@ -218,7 +218,9 @@ public class RecurringDepositService {
                 .orElseThrow(() -> new RuntimeException("RD not found with id " + rdId));
         if(rd.getFine()>0){
             return "You should pay all missed Installments and its fine";
-        }else {
+        } else if (rd.getStatus()== PAID_WAIT_MATURE) {
+            return "You should wait upto your account got MATURED to withdraw";
+        } else {
             LocalDate maturityDate = rd.getStartDate().plusMonths(rd.getTenureMonths());
 
             if (requestDate.isBefore(maturityDate)) {
