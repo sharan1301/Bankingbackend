@@ -57,4 +57,40 @@ public class UserRequests {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public LocalDate getRequestDate() {
+        return requestDate;
+    }
+
+    public void setRequestDate(LocalDate requestDate) {
+        this.requestDate = requestDate;
+    }
+
+    public String getAadhaarNumber() {
+        return aadhaarNumber;
+    }
+
+    public String getAccountType() {
+        return accountType;
+    }
+
+    public String getPanNumber() {
+        return panNumber;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
 }
