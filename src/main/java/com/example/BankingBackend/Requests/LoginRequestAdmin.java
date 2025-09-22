@@ -8,8 +8,8 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class LoginRequest {
-    private String full_name;
-    private String email;
+public class LoginRequestAdmin {
+    private String WorkId;
+//    private String email;
     private String password;
 }

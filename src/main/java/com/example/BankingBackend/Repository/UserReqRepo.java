@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface UserReqRepo extends JpaRepository<UserRequests,Integer> {
     List<UserRequests> findByStatus(String status);
+    Long countByStatus(String status);
 }

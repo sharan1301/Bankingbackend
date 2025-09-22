@@ -26,29 +26,29 @@ public class UserRequests {
     @Column(name = "last_name", nullable = false, length = 100)
     private String lastName;
 
-    @Column(nullable = false, unique = true, length = 150)
+    @Column(name="email",nullable = false,  length = 150)
     private String email;
 
-    @Column(length = 100)
+    @Column(name="occupation",length = 100)
     private String occupation;
 
     @Column(name = "account_type", nullable = false, length = 50)
     private String accountType;
 
-    @Column( nullable = false,length = 15)
+    @Column( name="phone" ,nullable = false,length = 15)
     private String phone;
 
-    @Column(name = "aadhaar_number", nullable = false, unique = true, length = 12)
+    @Column(name = "aadhaar_number", nullable = false,  length = 12)
     private String aadhaarNumber;
 
-    @Column(name = "pan_number", nullable = false, unique = true, length = 10)
+    @Column(name = "pan_number", nullable = false,  length = 10)
     private String panNumber;
 
     @Column(name = "annual_income")
     private Double annualIncome;
 
 
-    @Column(length = 20)
+    @Column(name="status",length = 20)
     private String status = "PENDING";
 
     @Column(name = "request_date")

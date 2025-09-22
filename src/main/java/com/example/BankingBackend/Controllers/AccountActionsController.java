@@ -8,16 +8,17 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 @RestController
 @RequestMapping("/admin/accounts")
 public class AccountActionsController {
     @Autowired
     AccountActionService accountActionService;
-    @PutMapping("/freezeaccount/{id}")
+    @PutMapping("/{id}/freeze")
    public ResponseEntity<?> freezeAccount(@PathVariable Long id){
         return accountActionService.freezeAccount(id);
     }
-    @PutMapping("/unfreezeaccount/{id}")
+    @PutMapping("{id}/unfreeze")
     public ResponseEntity<?> unfreezeAccount(@PathVariable Long id){
         return accountActionService.unfreezeAccount(id);
     }

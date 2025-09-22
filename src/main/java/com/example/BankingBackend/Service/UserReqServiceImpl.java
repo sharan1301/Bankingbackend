@@ -39,11 +39,17 @@ public class UserReqServiceImpl implements UserReqService {
         return userReqRepo.findByStatus("PENDING");
     }
 
+
     @Override
     public Optional<UserRequests> PendingRequestsById(int id) {
         Optional<UserRequests> userRequestsOpt=userReqRepo.findById(id);
         if(userRequestsOpt.isEmpty())
             throw new UserRequestNotFound("User Request not found");
         return userRequestsOpt;
+    }
+
+    @Override
+    public Long pendingReqStats() {
+        return userReqRepo.countByStatus("PENDING");
     }
 }

@@ -7,10 +7,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class UsersService {
-    @Autowired
-    UsersRepo usersRepo;
-    public List<Users> getAllUsers() {
-        return usersRepo.findAll();
-    }
+public interface UsersService {
+
+    public List<Users> getAllUsers() ;
+
+    Long userStats();
+
+    //Long accountStats();
 }
