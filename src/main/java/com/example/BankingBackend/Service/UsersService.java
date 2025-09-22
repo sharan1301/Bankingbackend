@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+
 @Service
 public interface UsersService {
 
@@ -13,5 +15,11 @@ public interface UsersService {
 
     Long userStats();
 
+    Optional<Users> findByEmail(String email);
+    Optional<Users> findByCustIdAndPassword(String custId, String password);
+    void sendOtp(String email);
+    boolean verifyOtp(String email, String otp);
+
     //Long accountStats();
+
 }

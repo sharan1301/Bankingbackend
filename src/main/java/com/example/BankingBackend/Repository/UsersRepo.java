@@ -18,5 +18,7 @@ public interface UsersRepo extends JpaRepository<Users,Integer> {
     @Query(value = "SELECT * FROM users WHERE aadhaar_number = :aadhaarNumber AND pan_number = :panNumber", nativeQuery = true)
     List<Users> findAllByAadhaarNumberAndPanNumber(@Param("aadhaarNumber") String aadhaarNumber,
                                                 @Param("panNumber") String panNumber);
+    Optional<Users> findByEmail(String email);
+    Optional<Users> findByCustIdAndPassword(String userId, String password);
 
 }

@@ -60,6 +60,14 @@ public class Users {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JsonIgnore // to avoid infinite recursion when serializing
     private List<LoanRequests> loanRequests;
+
+    public String getCustId() {
+        return custId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
 
 
