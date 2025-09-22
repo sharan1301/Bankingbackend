@@ -1,6 +1,7 @@
 package com.example.BankingBackend.Service;
 
 import com.example.BankingBackend.Model.LoanRequests;
+import com.example.BankingBackend.Model.UserAccountDto;
 
 import java.util.List;
 
@@ -9,5 +10,9 @@ public interface LoanReqService {
 
     List<LoanRequests> getPendingLoanReq();
 
-    LoanRequests getPendingLoanReqById(Long id);
+
+
+    LoanRequests getPendingLoanReqByUserId(int userID);
+
+
 }

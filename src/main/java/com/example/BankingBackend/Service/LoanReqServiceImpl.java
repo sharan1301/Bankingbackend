@@ -2,6 +2,7 @@ package com.example.BankingBackend.Service;
 
 import com.example.BankingBackend.Model.Account;
 import com.example.BankingBackend.Model.LoanRequests;
+import com.example.BankingBackend.Model.UserAccountDto;
 import com.example.BankingBackend.Model.Users;
 import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.LoanReqRepo;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -26,17 +28,24 @@ public class LoanReqServiceImpl implements LoanReqService {
 
     @Override
     public LoanRequests createLoanRequest(Integer userId, LoanRequests input) {
-        Optional<Users> userOpt = usersRepo.findById(userId);
-        if (userOpt.isEmpty()) {
-            throw new RuntimeException("User with ID " + userId + " not found");
+
+        Users user = usersRepo.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+
+        Account requestedAccount = input.getAccount(); // Assuming input.account is populated with accountId
+        if (requestedAccount == null || requestedAccount.getAccountId() == null) {
+            throw new RuntimeException("No account provided in the request");
         }
 
-      Optional<Account> accountOpt = accountRepo.findByUserId(userId);
-        if(accountOpt.get()==null){
-            throw  new AccountNotFound("The account for the user does not exist");
+        Account account = accountRepo.findById(requestedAccount.getAccountId())
+                .orElseThrow(() -> new AccountNotFound("Account not found with ID " + requestedAccount.getAccountId()));
+
+        if (!Objects.equals(account.getUser().getUserId(), userId)) {
+            throw new RuntimeException("This account does not belong to the given user");
         }
-        Users user = userOpt.get();
+
         input.setUser(user);
+        input.setAccount(account);
 
         if (input.getStatus() == null) {
             input.setStatus(LoanRequests.RequestStatus.PENDING);
@@ -51,10 +60,13 @@ public class LoanReqServiceImpl implements LoanReqService {
     }
 
     @Override
-    public LoanRequests getPendingLoanReqById(Long id) {
-        Optional<LoanRequests> loanRequestsOpt=loanReqRepo.findById(id);
-        if(loanRequestsOpt.isEmpty())
-            throw new LoanRequestNotFound("Loan request for the id is not found");
-        return loanRequestsOpt.get();
+    public LoanRequests getPendingLoanReqByUserId(int userID) {
+        LoanRequests loanRequestsOpt=loanReqRepo.findByUserIdAndStatusNative(userID,LoanRequests.RequestStatus.PENDING.name());
+        if(loanRequestsOpt==null)
+            throw new LoanRequestNotFound("No pending loan request for this user");
+        return  loanRequestsOpt;
     }
+
 }
+
+

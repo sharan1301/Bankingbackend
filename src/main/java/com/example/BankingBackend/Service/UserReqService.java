@@ -9,4 +9,6 @@ public interface UserReqService {
     public ResponseEntity<?> createRequest(UserRequests userRequests);
     public List<UserRequests> getAllPendingReq();
     public Optional<UserRequests> PendingRequestsById(int id);
+
+    Long pendingReqStats();
 }

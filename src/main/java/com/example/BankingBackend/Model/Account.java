@@ -41,7 +41,7 @@ public class Account {
     @Column(name = "BALANCE", precision = 15)
     private Double balance;
 
-    @Column(name="PIN" , length = 10)
+    @Column(name="PIN" , length = 60)
     private String pin;
 
     @Column(name = "BRANCH_CODE", length = 10)
@@ -90,10 +90,10 @@ public class Account {
     private List<Payee> payees;
 
     public enum AccountType {
-        SAVINGS, CURRENT, SALARY, NRI, JOINT
+        SAVINGS, CURRENT, SALARY, NRI, JOINT , BUSINESS
     }
 
     public enum AccountStatus {
-        ACTIVE, CLOSED, FROZEN
+        ACTIVE, CLOSED, FROZEN,INACTIVE
     }
 }

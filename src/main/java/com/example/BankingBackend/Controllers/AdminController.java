@@ -1,20 +1,21 @@
 package com.example.BankingBackend.Controllers;
 
-import com.example.BankingBackend.Model.Admin;
-import com.example.BankingBackend.Model.LoanRequests;
-import com.example.BankingBackend.Model.UserRequests;
-import com.example.BankingBackend.Model.Users;
+import com.example.BankingBackend.Model.*;
 import com.example.BankingBackend.Service.AdminService;
 import com.example.BankingBackend.Service.LoanReqService;
 import com.example.BankingBackend.Service.UserReqService;
 import com.example.BankingBackend.Service.UserReqService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-
+@CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -24,9 +25,14 @@ public class AdminController {
     UserReqService userRequestsService;
     @Autowired
     LoanReqService loanReqService;
-    @GetMapping("/getAdmins")
-    public List<Admin> getAdmins(){
-            return  adminService.getadmins();
+    @GetMapping("/profile")
+    public ResponseEntity<?> adminProfile(Authentication authentication){
+        return adminService.adminProfile(authentication);
+    }
+
+    @GetMapping("/allUsers")
+    public List<UserAccountDto> getAllUsers(){
+            return  adminService.getAllUsers();
     }
     @GetMapping("/pendingrequests")
     public List<UserRequests> getAllPendingReq(){
@@ -36,11 +42,11 @@ public class AdminController {
     public Optional<UserRequests> pendingRequestsById(@PathVariable int id){
         return userRequestsService.PendingRequestsById(id);
     }
-    @PutMapping("/{id}/approve")
+    @PutMapping("/requests/{id}/approve")
     public ResponseEntity<?> approveUser(@PathVariable int id){
         return adminService.approveUser(id);
     }
-    @PutMapping("/{id}/decline")
+    @PutMapping("/requests/{id}/decline")
     public ResponseEntity<?> declineUser(@PathVariable int id){
         return adminService.declineUser(id);
     }
@@ -48,9 +54,9 @@ public class AdminController {
     public List<LoanRequests> getAllLoanReq(){
         return loanReqService.getPendingLoanReq();
     }
-    @GetMapping("/pendingloanrequests/{id}")
-    public LoanRequests getAllLoanReq(@PathVariable Long  id){
-        return loanReqService.getPendingLoanReqById(id);
+    @GetMapping("/pendingloanrequests/{userID}")
+    public LoanRequests getAllLoanReq(@PathVariable int userID ){
+        return  loanReqService.getPendingLoanReqByUserId(userID);
     }
     @PutMapping("/loanrequest/{id}/approve")
     public ResponseEntity<?> approveLoan(@PathVariable Long  id){
@@ -62,4 +68,8 @@ public class AdminController {
         return adminService.declineLoan(id);
 
     }
+
+
+
+
 }
