@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.Console;
 import java.util.Map;
 
 @RestController
@@ -51,8 +50,8 @@ public class AuthController {
             return new ResponseEntity<>("User not registered",HttpStatus.UNAUTHORIZED);
         }
         Users user=userOptional.get();
-        if(!password.equals(user.getPassword())){
-            return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
+        if (!pwdEncoder.matches(password, user.getPassword())) {
+            return new ResponseEntity<>("Invalid User", HttpStatus.UNAUTHORIZED);
         }
         String token=jwtUtil.generateTokenWithRole(email,"ROLE_USER");
         return ResponseEntity.ok(Map.of("token",token,"role","USER"));
