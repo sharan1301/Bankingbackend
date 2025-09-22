@@ -69,6 +69,6 @@ public class FixedDepositController {
     public ResponseEntity<String> withdrawFD(@RequestParam Long fdId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         double amount = fdservice.withdrawFD(fdId,date);
-        return ResponseEntity.ok("✅ Withdrawal successful! Amount credited: " + amount);
+        return ResponseEntity.ok("Withdrawal successful! Amount credited: " + amount);
     }
 }

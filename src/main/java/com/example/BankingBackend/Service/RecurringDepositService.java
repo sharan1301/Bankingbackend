@@ -1,6 +1,7 @@
 package com.example.BankingBackend.Service;
 
 import com.example.BankingBackend.Model.Account;
+import com.example.BankingBackend.Model.FixedDeposit;
 import com.example.BankingBackend.Model.RecurringDeposit;
 import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.RecurringDepositRepo;
@@ -9,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+
+import static com.example.BankingBackend.Model.RecurringDeposit.DepositStatus.PAID_WAIT_MATURE;
 
 @Service
 public class RecurringDepositService {
@@ -21,12 +24,34 @@ public class RecurringDepositService {
     public Iterable<RecurringDeposit> fetchAllAccountswithfine(LocalDate date) {
         for (RecurringDeposit rd : rdRepo.findAll()) {
             applyMissedInstallmentFine(rd, date);
-            LocalDate maturitydate=rd.getMaturityDate();
-            if (rd.getFine() == 0
-                    && rd.getTotalDeposited() == (rd.getMonthlyInstallment() * rd.getTenureMonths())
-                    && (date.isAfter(maturitydate) || date.isEqual(maturitydate))) {
+            LocalDate maturitydate = rd.getMaturityDate();
+            double totalDue = rd.getMonthlyInstallment() * rd.getTenureMonths();
+
+            // 1. Fully paid, no fine, after or on maturity → MATURED
+            if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    (date.isAfter(maturitydate) || date.isEqual(maturitydate))) {
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
+
+            // 2. Fully paid, no fine, before maturity → PAID_WAIT_MATURE
+            else if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    date.isBefore(maturitydate)) {
+                rd.setStatus(RecurringDeposit.DepositStatus.PAID_WAIT_MATURE);
+            }
+
+            // 3. Not fully paid, before maturity, not closed/premature → ACTIVE
+            else if (rd.getTotalDeposited() < totalDue &&
+                    date.isBefore(maturitydate) &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE) {
+                rd.setStatus(RecurringDeposit.DepositStatus.ACTIVE);
+            }
+
+            // 4. Fully paid, after maturity but previously PAID_WAIT_MATURE → MATURED
+            else if (rd.getTotalDeposited() == totalDue && rd.getStatus() == RecurringDeposit.DepositStatus.PAID_WAIT_MATURE) {
+                rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
+            }
+
             rdRepo.save(rd);
         }
 
@@ -106,7 +131,7 @@ public class RecurringDepositService {
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
             rdRepo.save(rd); // Save the fine clearance before returning
-            return "✅ Fine amount of " + finePending + " and installment amount of "+
+            return "Fine amount of " + finePending + " and installment amount of "+
                     (x-finePending)+" is cleared.";
         }
         if(finePending > 0 && amount!=x){
@@ -130,7 +155,7 @@ public class RecurringDepositService {
         // 7. Update last installment date
         rd.setLastInstallmentDate(paymentDate);
 
-        message = "✅ Payment successful";
+        message = "Payment successful";
 
         // 8. If all installments paid → check maturity
         int monthsPaid = (int) (rd.getTotalDeposited() / rd.getMonthlyInstallment());
@@ -146,11 +171,11 @@ public class RecurringDepositService {
                 );
                 rd.setMaturityAmount(maturityAmount);
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
-                message = "✅ Payment done. RD is Matured.";
+                message = "Payment done. RD is Matured.";
             } else {
                 // ✅ Fully paid but waiting for maturity date
-                rd.setStatus(RecurringDeposit.DepositStatus.PAID_WAIT_MATURE);
-                message = "✅ All installments paid. Waiting until maturity date.";
+                rd.setStatus(PAID_WAIT_MATURE);
+                message = "All installments paid. Waiting until maturity date.";
             }
         }
 
@@ -203,7 +228,7 @@ public class RecurringDepositService {
                 double effectiverate = rd.getInterestRate() - penaltyRate;
                 double amount = calculateMaturityAmount(rd.getMonthlyInstallment(), effectiverate, monthsPaid);
 
-                return "⚠ Premature Withdrawal Detected!\n" +
+                return "Premature Withdrawal Detected!\n" +
                         "Installments paid: " + monthsPaid + " out of " + rd.getTenureMonths() + "\n" +
                         "Withdrawal amount (after 1% penalty): " + amount +
                         "\nDo you want to proceed?";
@@ -215,7 +240,7 @@ public class RecurringDepositService {
                         rd.getTenureMonths()
                 );
 
-                return "✅ Eligible for Maturity Withdrawal\n" +
+                return "Eligible for Maturity Withdrawal\n" +
                         "Withdrawal amount: " + maturityAmount +
                         "\nNo penalty. Do you want to proceed?";
             }

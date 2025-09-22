@@ -13,7 +13,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/users/RecurringDeposit")
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+@CrossOrigin(origins = "http://127.0.0.1:5500", allowedHeaders = "*", allowCredentials = "true")
 public class RecurringDepositController {
 
     @Autowired
@@ -74,7 +74,7 @@ public class RecurringDepositController {
     public ResponseEntity<String> withdrawRD(@RequestParam Long rdId,
                                              @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         double amount = rdService.withdrawRD(rdId,date);
-        return ResponseEntity.ok("✅ Withdrawal successful! Amount credited: " + amount);
+        return ResponseEntity.ok("Withdrawal successful! Amount credited: " + amount);
     }
 }
 

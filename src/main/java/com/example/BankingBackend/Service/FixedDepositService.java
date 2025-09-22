@@ -25,6 +25,9 @@ public class FixedDepositService {
         for (FixedDeposit fd : fdrepo.findAll()) {
             if (date.isAfter(fd.getMaturityDate()) || date.isEqual(fd.getMaturityDate())) {
                 fd.setStatus(FixedDeposit.DepositStatus.MATURED);
+            } else if (date.isBefore(fd.getMaturityDate()) && (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
+                    fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+                fd.setStatus(FixedDeposit.DepositStatus.ACTIVE);
             }
             fdrepo.save(fd);
         }
@@ -46,7 +49,8 @@ public class FixedDepositService {
         fd.setStatus(request.getStatus());
 
         double maturity = calculateMaturityAmount(request.getDepositAmount(), request.getInterestRate(), request.getTenureMonths());
-        fd.setMaturityAmount(maturity);
+        double rounded = Math.round(maturity * 100.0) / 100.0;
+        fd.setMaturityAmount(rounded);
 
         logger.info("FD created: {}", fd);
         return fdrepo.save(fd);
@@ -75,13 +79,15 @@ public class FixedDepositService {
             double penaltyRate = 1.0; // 1%
             double effectiveRate = fd.getInterestRate() - penaltyRate;
             double amount = calculateMaturityAmount(fd.getDepositAmount(), effectiveRate, monthsCompleted);
-            return "⚠ You are withdrawing before maturity!\n" +
-                        "Withdrawal amount after penalty: " + amount +
+            double rounded = Math.round(amount * 100.0) / 100.0;
+            return "You are withdrawing before maturity!\n" +
+                        "Withdrawal amount after penalty: " + rounded +
                         "\nDo you want to proceed?";
         } else {
             // After maturity
             double amount = fd.getMaturityAmount();
-            return "✅ Your withdrawal amount: " + amount +
+            double rounded = Math.round(amount * 100.0) / 100.0;
+            return " Your withdrawal amount: " + rounded +
                     "\nNo penalty. Do you want to proceed?";
         }
     }
@@ -91,25 +97,26 @@ public class FixedDepositService {
                 .orElseThrow(() -> new RuntimeException("FD not found"));
 
         LocalDate today = date;
-        long monthsCompleted = ChronoUnit.MONTHS.between(fd.getStartDate(), today);
-
+        long daysCompleted = ChronoUnit.DAYS.between(fd.getStartDate(), today);
+        double monthsCompleted = daysCompleted / 30.0;
         double payout;
-
-        if (monthsCompleted < fd.getTenureMonths()) {
+        double rounded;
+        if (today.isBefore(fd.getMaturityDate())) {
             // Premature withdrawal
             double penaltyRate = 1.0;
             double years = monthsCompleted / 12.0;
             double effectiveRate = fd.getInterestRate() - penaltyRate;
-            payout = calculateMaturityAmount(fd.getDepositAmount(), effectiveRate, fd.getTenureMonths());
+            payout = calculateMaturityAmount(fd.getDepositAmount(), effectiveRate, (int)monthsCompleted);
+            rounded = Math.round(payout * 100.0) / 100.0;
             fd.setStatus(FixedDeposit.DepositStatus.valueOf("PREMATURE_CLOSURE"));
         } else {
             // Normal withdrawal
             payout = fd.getMaturityAmount();
+            rounded = Math.round(payout * 100.0) / 100.0;
             fd.setStatus(FixedDeposit.DepositStatus.valueOf("CLOSED"));
-
         }
-        fd.setMaturityAmount(payout);
+        fd.setMaturityAmount(rounded);
         fdrepo.save(fd);
-        return payout;
+        return rounded;
     }
 }
