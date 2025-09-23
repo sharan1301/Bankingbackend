@@ -58,7 +58,7 @@ public class Users {
     @Column(name="status",length = 20)
     private String status; // APPROVED
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore // to avoid infinite recursion when serializing
+    @JsonIgnore
     private List<LoanRequests> loanRequests;
 
     public String getCustId() {

@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 @RestController
 @RequestMapping("/users")
@@ -18,14 +20,13 @@ public class LoanReqController {
     @Autowired
     LoanReqService loanReqService;
 
-    @PostMapping("/{userId}/loan-requests")
-    public ResponseEntity<LoanRequests> createLoanRequest(
-            @PathVariable Integer userId,
-            @RequestBody LoanRequests request) {
-
-        LoanRequests savedRequest = loanReqService.createLoanRequest(userId, request);
-
-        return ResponseEntity.ok(savedRequest);
+    @PostMapping("/loan-requests")
+    public ResponseEntity<?> createLoanRequest(@RequestBody Map<String, Object> requestBody) {
+        try {
+            loanReqService.createLoanRequest(requestBody);
+            return ResponseEntity.ok("Loan request submitted successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
-
 }

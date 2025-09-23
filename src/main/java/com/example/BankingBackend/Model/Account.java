@@ -96,4 +96,12 @@ public class Account {
     public enum AccountStatus {
         ACTIVE, CLOSED, FROZEN,INACTIVE
     }
+
+    public Users getUser() {
+        return user;
+    }
+
+    public Long getAccountNumber() {
+        return accountNumber;
+    }
 }

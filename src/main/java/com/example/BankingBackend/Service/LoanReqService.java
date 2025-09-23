@@ -4,9 +4,10 @@ import com.example.BankingBackend.Model.LoanRequests;
 import com.example.BankingBackend.Model.UserAccountDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LoanReqService {
-    LoanRequests createLoanRequest(Integer userId, LoanRequests input);
+    void createLoanRequest(Map<String, Object> requestBody);
 
     List<LoanRequests> getPendingLoanReq();
 

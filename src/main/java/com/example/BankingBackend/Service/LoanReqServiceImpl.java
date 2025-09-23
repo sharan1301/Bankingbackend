@@ -1,9 +1,6 @@
 package com.example.BankingBackend.Service;
 
-import com.example.BankingBackend.Model.Account;
-import com.example.BankingBackend.Model.LoanRequests;
-import com.example.BankingBackend.Model.UserAccountDto;
-import com.example.BankingBackend.Model.Users;
+import com.example.BankingBackend.Model.*;
 import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.LoanReqRepo;
 import com.example.BankingBackend.Repository.UsersRepo;
@@ -13,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,31 +24,36 @@ public class LoanReqServiceImpl implements LoanReqService {
     @Autowired
     AccountRepo accountRepo;
 
+
     @Override
-    public LoanRequests createLoanRequest(Integer userId, LoanRequests input) {
+    public void createLoanRequest(Map<String, Object> requestBody) {
 
-        Users user = usersRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
+        Long accountNumber = Long.valueOf(requestBody.get("accountNumber").toString());
+        String loanTypeStr = requestBody.get("loanType").toString();
+        Double loanAmount = Double.valueOf(requestBody.get("loanAmount").toString());
+        Integer tenureMonths = Integer.valueOf(requestBody.get("tenureMonths").toString());
 
-        Account requestedAccount = input.getAccount(); // Assuming input.account is populated with accountId
-        if (requestedAccount == null || requestedAccount.getAccountId() == null) {
-            throw new RuntimeException("No account provided in the request");
+        Optional<Account> accountOpt = accountRepo.findByAccountNumber(accountNumber);
+        if (accountOpt.isEmpty()) {
+            throw new RuntimeException("Account not found.");
         }
 
-        Account account = accountRepo.findById(requestedAccount.getAccountId())
-                .orElseThrow(() -> new AccountNotFound("Account not found with ID " + requestedAccount.getAccountId()));
+        Account account = accountOpt.get();
+        Users user = account.getUser();
 
-        if (!Objects.equals(account.getUser().getUserId(), userId)) {
-            throw new RuntimeException("This account does not belong to the given user");
+        boolean pendingExists = loanReqRepo.existsByAccountAndStatus(account, LoanRequests.RequestStatus.PENDING);
+        if (pendingExists) {
+            throw new RuntimeException("A pending loan request already exists for this account.");
         }
 
-        input.setUser(user);
-        input.setAccount(account);
+        LoanRequests loanRequest = new LoanRequests();
+        loanRequest.setAccount(account);
+        loanRequest.setUser(user);
+        loanRequest.setLoanType(LoanRequests.LoanType.valueOf(loanTypeStr));
+        loanRequest.setLoanAmount(loanAmount);
+        loanRequest.setTenureMonths(tenureMonths);
 
-        if (input.getStatus() == null) {
-            input.setStatus(LoanRequests.RequestStatus.PENDING);
-        }
-        return loanReqRepo.save(input);
+        loanReqRepo.save(loanRequest);
     }
 
     @Override
