@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-package org.example.Controllers;
 
-import org.example.Model.Payee;
-import org.example.Repository.PayeeRepository;
-import org.example.Services.PayeeService;
-=======
 package com.example.BankingBackend.Controllers;
 
 import com.example.BankingBackend.Model.Payee;
 import com.example.BankingBackend.Repository.PayeeRepo;
 import com.example.BankingBackend.Service.PayeeService;
->>>>>>> sharan
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +21,8 @@ public class PayeeController {
     private PayeeService payeeService;
 
     @Autowired
-<<<<<<< HEAD
-    private PayeeRepository payeeRepository;
-=======
     private PayeeRepo payeeRepository;
->>>>>>> sharan
+
 
     @PostMapping("/{accountId}/add")
     public ResponseEntity<Payee> addPayee(@PathVariable Long accountId, @RequestBody Payee payee) {
@@ -77,21 +67,6 @@ public ResponseEntity<Payee> updatePayee(@PathVariable int payeeId, @RequestBody
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }
 
-
-<<<<<<< HEAD
-    @DeleteMapping("/{payeeId}")
-=======
-    @DeleteMapping("/account/{payeeId}")
->>>>>>> sharan
-    public ResponseEntity<Void> deletePayee(@PathVariable int payeeId) {
-        Optional<Payee> existingPayee = payeeService.getPayeeById(payeeId);
-        if (existingPayee.isPresent()) {
-            payeeService.deletePayee(payeeId);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
     }
 }

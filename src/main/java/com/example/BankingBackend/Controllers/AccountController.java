@@ -1,8 +1,7 @@
-package org.example.Controllers;
-import org.example.Model.Account;
-import org.example.Model.Users;
-import org.example.Repository.AccountRepository;
-import org.example.Services.AccountService;
+package com.example.BankingBackend.Controllers;
+
+import com.example.BankingBackend.Model.Account;
+import com.example.BankingBackend.Service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

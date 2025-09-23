@@ -35,7 +35,7 @@ public class SecurityConfig {
                         .antMatchers("/user-requests/**").permitAll()
                         .anyRequest().authenticated()
                 )
-
+                .httpBasic(Customizer.withDefaults())//shristi
                 .cors(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         http.cors();

@@ -1,5 +1,6 @@
-package org.example.Model;
+package com.example.BankingBackend.Model;
 
+import com.example.BankingBackend.Model.Account;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 

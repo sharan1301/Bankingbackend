@@ -1,5 +1,6 @@
 package com.example.BankingBackend.Service;
 
+import com.example.BankingBackend.Model.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -19,5 +20,8 @@ public class EmailService {
         message.setSubject(subject);
         javaMailSender.send(message);
         System.out.println("Mail send successfully");
+    }
+
+    public void sendComplaintMail(CustomerService complaint) {
     }
 }

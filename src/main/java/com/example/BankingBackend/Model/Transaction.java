@@ -1,4 +1,4 @@
-package org.example.Model;
+package com.example.BankingBackend.Model;
 
 import com.example.BankingBackend.Model.Account;
 import lombok.AllArgsConstructor;

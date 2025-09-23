@@ -1,14 +1,13 @@
 package com.example.BankingBackend.Service;
 
-
 import com.example.BankingBackend.Model.Account;
 import com.example.BankingBackend.Model.Autopay;
-import com.example.BankingBackend.Model.Payee;
 import com.example.BankingBackend.Model.Transaction;
 import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.AutopayRepo;
 import com.example.BankingBackend.Repository.PayeeRepo;
 import com.example.BankingBackend.Repository.TransactionRepo;
+import com.example.BankingBackend.Model.Payee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
