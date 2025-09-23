@@ -29,15 +29,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = jwtUtil.extractEmail(token);
                 String role = jwtUtil.extractRole(token); // 🔹 New: extract role from token
 
-                var auth = new UsernamePasswordAuthenticationToken(
+                var authentication = new UsernamePasswordAuthenticationToken(
                         email,
                         null,
                         List.of(new SimpleGrantedAuthority(role)) // 🔹 attach role
                 );
-
-                SecurityContextHolder.getContext().setAuthentication(auth);
+                System.out.println("JwtFilter triggered for URI: " + request.getRequestURI());
+                System.out.println("Authorization header: " + authHeader);
+                System.out.println("User email: " + email + ", role: " + role);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
         filterChain.doFilter(request, response);
+
     }
 }

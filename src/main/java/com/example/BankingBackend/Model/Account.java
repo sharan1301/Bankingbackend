@@ -1,19 +1,22 @@
 package com.example.BankingBackend.Model;
 
 import javax.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "ACCOUNTS")
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Account {
@@ -35,8 +38,11 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountType accountType;
 
-    @Column(name = "BALANCE", precision = 15, scale = 2)
+    @Column(name = "BALANCE", precision = 15)
     private Double balance;
+
+    @Column(name="PIN" , length = 60)
+    private String pin;
 
     @Column(name = "BRANCH_CODE", length = 10)
     private String branchCode;
@@ -52,7 +58,7 @@ public class Account {
     @Enumerated(EnumType.STRING)
     private AccountStatus status = AccountStatus.ACTIVE;
 
-    @Column(name = "MINIMUM_BALANCE", precision = 10, scale = 2)
+    @Column(name = "MINIMUM_BALANCE", precision = 10)
     private Double minimumBalance;
 
     @CreationTimestamp
@@ -71,6 +77,7 @@ public class Account {
     private List<Card> cards;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Loan> loans;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -83,10 +90,10 @@ public class Account {
     private List<Payee> payees;
 
     public enum AccountType {
-        SAVINGS, CURRENT, SALARY, NRI, JOINT
+        SAVINGS, CURRENT, SALARY, NRI, JOINT , BUSINESS
     }
 
     public enum AccountStatus {
-        ACTIVE, INACTIVE, SUSPENDED, CLOSED, FROZEN
+        ACTIVE, CLOSED, FROZEN,INACTIVE
     }
 }

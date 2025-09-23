@@ -1,5 +1,6 @@
 package org.example.Model;
 
+import com.example.BankingBackend.Model.Account;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

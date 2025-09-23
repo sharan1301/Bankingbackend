@@ -3,18 +3,21 @@ package com.example.BankingBackend.Model;
 import javax.persistence.*;
 /*import javax.validation.constraints.*;*/
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
+import java.sql.ConnectionBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "CARDS")
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
@@ -62,6 +65,8 @@ public class Card {
     @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private LocalDateTime updatedAt;
+
+
 
     public enum CardStatus {
         ACTIVE, INACTIVE, BLOCKED, EXPIRED, CANCELLED

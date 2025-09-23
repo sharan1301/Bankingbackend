@@ -5,10 +5,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 @Configuration
 public class SecurityConfig {
@@ -23,14 +31,39 @@ public class SecurityConfig {
                 .authorizeRequests(auth -> auth
                         .antMatchers("/auth/**").permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
-                        .antMatchers("/users/**").hasAnyRole("USERS","ADMIN")
-                        .antMatchers("/requests/**").permitAll()
+                        .antMatchers("/users/**").hasAnyRole("USER","ADMIN")
+                        .antMatchers("/user-requests/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
+                .cors(Customizer.withDefaults())
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
+        http.cors();
         return http.build();
+    }
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5501", "http://localhost:5501"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+    @Bean
+    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
+        UserDetails admin = User.withUsername("admin")
+                .password(encoder.encode("1234"))
+                .roles("ADMIN")
+                .build();
+        UserDetails user = User.withUsername("user")
+                .password(encoder.encode("1234"))
+                .roles("USER")
+                .build();
+        return new InMemoryUserDetailsManager(admin, user);
     }
 
 

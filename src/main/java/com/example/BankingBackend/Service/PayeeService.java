@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 package org.example.Services;
 import org.example.Model.Payee;
+=======
+package com.example.BankingBackend.Service;
+
+
+import com.example.BankingBackend.Model.Payee;
+
+>>>>>>> sharan
 import java.util.List;
 import java.util.Optional;
 
