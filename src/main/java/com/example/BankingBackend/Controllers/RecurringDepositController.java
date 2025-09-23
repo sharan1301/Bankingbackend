@@ -24,9 +24,9 @@ public class RecurringDepositController {
         return "homepage";
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<RecurringDeposit> addacc(@RequestBody RecurringDeposit request) {
-        RecurringDeposit savedFd = rdService.AddingAcc(request);
+    @PostMapping("/{userId}/add")
+    public ResponseEntity<RecurringDeposit> addacc(@PathVariable int userId,@RequestBody RecurringDeposit request) {
+        RecurringDeposit savedFd = rdService.AddingAcc(userId,request);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFd);
     }
 

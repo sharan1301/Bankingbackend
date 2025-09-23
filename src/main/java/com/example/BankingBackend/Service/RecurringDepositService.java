@@ -58,9 +58,30 @@ public class RecurringDepositService {
         return rdRepo.findAll();
     }
 
-    public RecurringDeposit AddingAcc(RecurringDeposit request) {
+    public RecurringDeposit AddingAcc(int userId,RecurringDeposit request) {
         Account account = accountRepository.findById(request.getAccount().getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found with id " + request.getAccount().getAccountId()));
+
+        // 2. Validate account belongs to the user
+        if (account.getUser() == null || account.getUser().getUserId() != userId) {
+            throw new RuntimeException("Account " + account.getAccountId() + " does not belong to user " + userId);
+        }
+
+        // 3. Validate account status
+        if (account.getStatus()== Account.AccountStatus.FROZEN) {
+            throw new RuntimeException("Account " + account.getAccountId() + " is not ACTIVE");
+        }
+
+        // 4. Validate sufficient balance
+        if (request.getMonthlyInstallment() > account.getBalance()) {
+            throw new RuntimeException("Insufficient balance in account " + account.getAccountId());
+        }
+
+        // 5. Deduct deposit amount from account balance
+        double newBalance = account.getBalance() - request.getMonthlyInstallment();
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+
 
         RecurringDeposit rd = new RecurringDeposit();
         rd.setAccount(account);
@@ -258,13 +279,14 @@ public class RecurringDepositService {
         LocalDate maturityDate = rd.getStartDate().plusMonths(rd.getTenureMonths());
         double payout;
 
+        double rounded;
         if (requestDate.isBefore(maturityDate)) {
             // Premature closure
             int monthsPaid = (int) (rd.getTotalDeposited() / rd.getMonthlyInstallment());
             double penaltyRate = 1.0; // 1% penalty
             double effectiverate = rd.getInterestRate()-penaltyRate;
             payout = calculateMaturityAmount(rd.getMonthlyInstallment(),  effectiverate,monthsPaid);
-
+            rounded = Math.round(payout * 100.0) / 100.0;
             rd.setStatus(RecurringDeposit.DepositStatus.PREMATURE_CLOSURE);
 
         } else {
@@ -274,10 +296,15 @@ public class RecurringDepositService {
                     rd.getInterestRate(),
                     rd.getTenureMonths()
             );
+            rounded = Math.round(payout * 100.0) / 100.0;
             rd.setStatus(RecurringDeposit.DepositStatus.CLOSED);
         }
-        rd.setMaturityAmount(payout);
+        rd.setMaturityAmount(rounded);
         rdRepo.save(rd);
+        Account account = rd.getAccount();
+        double newBalance = account.getBalance() + rounded;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
         return payout;
     }
 

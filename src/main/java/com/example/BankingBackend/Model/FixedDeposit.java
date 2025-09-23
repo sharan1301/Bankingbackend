@@ -1,18 +1,13 @@
 package com.example.BankingBackend.Model;
 
 import javax.persistence.*;
-//import jakarta.validation.constraints.*;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -29,6 +24,7 @@ public class FixedDeposit {
     @Column(name = "FD_ID", nullable = false, precision = 10)
     private Long fdId;
 
+    // --- Relation with Account ---
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonIgnoreProperties({
             "fixedDeposits",
@@ -41,27 +37,34 @@ public class FixedDeposit {
             "handler"
     })
     @JoinColumn(name = "ACCOUNT_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_FD_ACCOUNT"))
-
     private Account account;
 
-    @Column(name = "DEPOSIT_AMOUNT", precision = 15, scale = 2)
+    // --- Relation with Users ---
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnoreProperties({
+            "fixedDeposits",
+            "recurringDeposits",
+            "loanRequests",
+            "hibernateLazyInitializer",
+            "handler"
+    })
+    @JoinColumn(name = "USER_ID", nullable = false, foreignKey = @ForeignKey(name = "FK_FD_USER"))
+    private Users user;
 
+    // --- FD Details ---
+    @Column(name = "DEPOSIT_AMOUNT", precision = 15, scale = 2)
     private Double depositAmount;
 
     @Column(name = "INTEREST_RATE", precision = 5, scale = 2)
-
     private Double interestRate;
 
     @Column(name = "MATURITY_AMOUNT", precision = 15, scale = 2)
-
     private Double maturityAmount;
 
     @Column(name = "MATURITY_DATE")
-
     private LocalDate maturityDate;
 
     @Column(name = "START_DATE")
-
     private LocalDate startDate;
 
     @Column(name = "STATUS", length = 20)
@@ -69,7 +72,6 @@ public class FixedDeposit {
     private DepositStatus status = DepositStatus.ACTIVE;
 
     @Column(name = "TENURE_MONTHS", nullable = false, precision = 10)
-
     private Integer tenureMonths;
 
     @CreationTimestamp

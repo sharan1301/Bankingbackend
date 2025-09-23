@@ -28,10 +28,10 @@ public class FixedDepositController {
         return "homepage";
     }
 
-    @PostMapping("/add")
-    public ResponseEntity<FixedDeposit> addacc(@RequestBody FixedDeposit request) {
+    @PostMapping("/{userId}/add")
+    public ResponseEntity<FixedDeposit> addacc(@PathVariable int userId,@RequestBody FixedDeposit request) {
         logger.info("Received request to add FD: {}", request);
-        FixedDeposit savedFd = fdservice.AddingAcc(request);
+        FixedDeposit savedFd = fdservice.AddingAcc(userId,request);
         logger.info("FD saved: {}", savedFd);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFd);
     }

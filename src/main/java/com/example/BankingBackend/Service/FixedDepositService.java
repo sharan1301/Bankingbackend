@@ -34,27 +34,55 @@ public class FixedDepositService {
         return fdrepo.findAll();
     }
 
-    public FixedDeposit AddingAcc(FixedDeposit request) {
+    public FixedDeposit AddingAcc(int userId, FixedDeposit request) {
         logger.info("Adding FD for account: {}", request.getAccount().getAccountId());
+
+        // 1. Find the account by ID
         Account account = accountRepository.findById(request.getAccount().getAccountId())
                 .orElseThrow(() -> new RuntimeException("Account not found with id " + request.getAccount().getAccountId()));
 
+        // 2. Validate account belongs to the user
+        if (account.getUser() == null || account.getUser().getUserId() != userId) {
+            throw new RuntimeException("Account " + account.getAccountId() + " does not belong to user " + userId);
+        }
+
+        // 3. Validate account status
+        if (account.getStatus()== Account.AccountStatus.FROZEN) {
+            throw new RuntimeException("Account " + account.getAccountId() + " is not ACTIVE");
+        }
+
+        // 4. Validate sufficient balance
+        if (request.getDepositAmount() > account.getBalance()) {
+            throw new RuntimeException("Insufficient balance in account " + account.getAccountId());
+        }
+
+        // 5. Deduct deposit amount from account balance
+        double newBalance = account.getBalance() - request.getDepositAmount();
+        account.setBalance(newBalance);
+        accountRepository.save(account);
+
+        // 6. Create Fixed Deposit object
         FixedDeposit fd = new FixedDeposit();
-        fd.setAccount(account); // Important: set managed entity
+        fd.setAccount(account);
+        fd.setUser(account.getUser()); // set user as well
         fd.setDepositAmount(request.getDepositAmount());
         fd.setInterestRate(request.getInterestRate());
         fd.setStartDate(request.getStartDate());
-        fd.setMaturityDate(request.getStartDate().plusMonths(request.getTenureMonths()));
         fd.setTenureMonths(request.getTenureMonths());
-        fd.setStatus(request.getStatus());
+        fd.setMaturityDate(request.getStartDate().plusMonths(request.getTenureMonths()));
+        fd.setStatus(FixedDeposit.DepositStatus.ACTIVE);
 
-        double maturity = calculateMaturityAmount(request.getDepositAmount(), request.getInterestRate(), request.getTenureMonths());
+        // 7. Calculate maturity amount
+        double maturity = calculateMaturityAmount(request.getDepositAmount(),
+                request.getInterestRate(),
+                request.getTenureMonths());
         double rounded = Math.round(maturity * 100.0) / 100.0;
         fd.setMaturityAmount(rounded);
 
         logger.info("FD created: {}", fd);
         return fdrepo.save(fd);
     }
+
 
     // Auto-calc maturity amount
 
@@ -117,6 +145,10 @@ public class FixedDepositService {
         }
         fd.setMaturityAmount(rounded);
         fdrepo.save(fd);
+        Account account = fd.getAccount();
+        double newBalance = account.getBalance() + rounded;
+        account.setBalance(newBalance);
+        accountRepository.save(account);
         return rounded;
     }
 }
