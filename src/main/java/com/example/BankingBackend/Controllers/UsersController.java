@@ -4,6 +4,7 @@ import com.example.BankingBackend.Model.Users;
 import com.example.BankingBackend.Service.UsersService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,10 +12,13 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("users/auth")
+@CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 public class UsersController {
 
     @Autowired
     private UsersService usersService;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestParam String email) {
@@ -38,13 +42,31 @@ public class UsersController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Users users) {
         String custId = users.getCustId();
-        String password = users.getPassword();
+        String rawPassword = users.getPassword();
 
-        Optional<Users> user = usersService.findByCustIdAndPassword(custId, password);
-        if (user.isEmpty()) {
+        Optional<Users> userOpt = usersService.findByCustId(custId);
+        if (userOpt.isEmpty()) {
             return ResponseEntity.badRequest().body("Invalid UserId or Password.");
         }
+        Users user = userOpt.get();
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            return ResponseEntity.badRequest().body("Invalid UserId or Password.");
+        }
+
         return ResponseEntity.ok("Login successful via UserId+Password.");
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(
+            @RequestParam String custId,
+            @RequestParam String newPassword) {
+        boolean updated = usersService.resetPassword(custId, newPassword);
+        if (updated) {
+            return ResponseEntity.ok("Password updated successfully.");
+        } else {
+            return ResponseEntity.badRequest().body("Invalid username.");
+        }
     }
 
 }

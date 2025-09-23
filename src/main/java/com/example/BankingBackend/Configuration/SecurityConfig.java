@@ -27,6 +27,12 @@ public class SecurityConfig {
                 .csrf(csrf->csrf.disable())
                 .authorizeRequests(auth -> auth
                         .antMatchers("/auth/**").permitAll()
+                        .antMatchers(
+                                "/users/auth/send-otp",
+                                "/users/auth/verify-otp",
+                                "/users/auth/reset-password",
+                                "/users/auth/login"
+                        ).permitAll()
                         .antMatchers("/admin/**").hasRole("ADMIN")
                         .antMatchers("/users/**").hasAnyRole("USER","ADMIN")
                         .antMatchers("/user-requests/**").permitAll()
