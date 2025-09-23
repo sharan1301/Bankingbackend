@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,4 +20,10 @@ public interface AccountRepo extends JpaRepository<Account,Long> {
     long countByAccountType(Account.AccountType type);
     long countByAccountTypeAndStatus(Account.AccountType type, Account.AccountStatus status);
 
+    //shristi
+    Account findByAccountNumber(Long accountNumber);
+    List<Account> findByUser_UserId(Long userId);
+
+    //ashok
+//    Optional<Account> findByUser
 }
