@@ -19,6 +19,7 @@ public interface AccountRepo extends JpaRepository<Account,Long> {
     long countByStatus(Account.AccountStatus status);
     long countByAccountType(Account.AccountType type);
     long countByAccountTypeAndStatus(Account.AccountType type, Account.AccountStatus status);
+    Optional<Account> findByAccountNumber(Long accountNumber);
 
     Account findByAccountNumber(Long accountNumber);
     List<Account> findByUser_UserId(Long userId);

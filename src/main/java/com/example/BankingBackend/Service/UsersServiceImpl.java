@@ -7,6 +7,7 @@ import com.example.BankingBackend.Repository.UsersRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,6 +18,9 @@ public class UsersServiceImpl implements UsersService{
     UsersRepo usersRepo;
     @Autowired
     AccountRepo accountRepo;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @Autowired
     JavaMailSender mailSender;
@@ -43,8 +47,8 @@ public class UsersServiceImpl implements UsersService{
     }
 
     @Override
-    public Optional<Users> findByCustIdAndPassword(String custId, String password) {
-        return usersRepo.findByCustIdAndPassword(custId,password);
+    public Optional<Users> findByCustId(String custId){
+        return usersRepo.findByCustId(custId);
     }
 
     @Override
@@ -64,5 +68,17 @@ public class UsersServiceImpl implements UsersService{
     @Override
     public boolean verifyOtp(String email, String otp) {
         return otpStore.containsKey(email) && otpStore.get(email).equals(otp);
+    }
+
+    public boolean resetPassword(String custId, String newPassword) {
+        Optional<Users> userOpt = usersRepo.findByCustId(custId);
+        if (userOpt.isPresent()) {
+            Users user = userOpt.get();
+            String hashedPassword = passwordEncoder.encode(newPassword);
+            user.setPassword(hashedPassword);
+            usersRepo.save(user);
+            return true;
+        }
+        return false;
     }
 }

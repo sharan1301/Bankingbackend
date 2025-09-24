@@ -16,9 +16,10 @@ public interface UsersService {
     Long userStats();
 
     Optional<Users> findByEmail(String email);
-    Optional<Users> findByCustIdAndPassword(String custId, String password);
+    Optional<Users> findByCustId (String CustId);
     void sendOtp(String email);
     boolean verifyOtp(String email, String otp);
+    boolean resetPassword(String custId, String password);
 
     //Long accountStats();
 
