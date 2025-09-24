@@ -26,6 +26,12 @@ public class CreditCardApplicationService {
 
     // Save user application
     public CreditCardApplication apply(CreditCardApplication application) {
+        String aadhar=application.getAadhaarNumber();
+        List<Users> user = usersRepository.findByAadhaarNumber(aadhar);
+        if(user.isEmpty()){
+            throw new RuntimeException("User not found");
+        }
+
         application.setStatus(CreditCardApplication.ApplicationStatus.UNDER_REVIEW);
         application.setSubmittedAt(LocalDateTime.now());
         return applicationRepository.save(application);
@@ -33,6 +39,7 @@ public class CreditCardApplicationService {
 
     // Get all applications
     public List<CreditCardApplication> getAllApplications() {
+
         return applicationRepository.findAll();
     }
 
@@ -69,46 +76,48 @@ public class CreditCardApplicationService {
 //    }
 
 
-    public Card handleApplication(Long applicationId, boolean approve, String remark) {
-
-        CreditCardApplication application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
-
-        Users user = usersRepository.findByAadhaarNumber(application.getAadhaarNumber())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        Account account = accountRepository.findByUserId(user.getUserId())
-                .orElseThrow(() -> new RuntimeException("Account not found"));
-
-        if (approve) {
-            if (application.getStatus() == CreditCardApplication.ApplicationStatus.APPROVED) {
-                throw new RuntimeException("Application already approved");
-            }
-
-            application.setStatus(CreditCardApplication.ApplicationStatus.APPROVED);
-            application.setApprovedAt(LocalDateTime.now());
-            applicationRepository.save(application);
-
-            Card card = Card.builder()
-                    .user(user)
-                    .account(account)
-                    .cardNumber(generateCardNumber())
-                    .cvv(generateCVV())
-                    .expiryDate(generateExpiryDate())
-                    .status(Card.CardStatus.ACTIVE)
-                    .cardType(mapCardType(application.getCardType()))
-                    .build();
-
-            return cardRepo.save(card);
-
-        } else {
-            application.setStatus(CreditCardApplication.ApplicationStatus.REJECTED);
-            application.setRemarks(remark != null ? remark : "Application rejected");
-            applicationRepository.save(application);
-
-            return null;
-        }
-    }
+//    public Card handleApplication(Long applicationId, boolean approve, String remark) {
+//
+//        CreditCardApplication application = applicationRepository.findById(applicationId)
+//                .orElseThrow(() -> new RuntimeException("Application not found"));
+//        String aadhar=application.getAadhaarNumber();
+//        List<Users> user = usersRepository.findByAadhaarNumber(aadhar);
+//        if(user.isEmpty()){
+//            throw new RuntimeException("User not found");
+//        }
+//
+//        Account account = accountRepository.findByUserId(user.getUserId())
+//                .orElseThrow(() -> new RuntimeException("Account not found"));
+//
+//        if (approve) {
+//            if (application.getStatus() == CreditCardApplication.ApplicationStatus.APPROVED) {
+//                throw new RuntimeException("Application already approved");
+//            }
+//
+//            application.setStatus(CreditCardApplication.ApplicationStatus.APPROVED);
+//            application.setApprovedAt(LocalDateTime.now());
+//            applicationRepository.save(application);
+//
+//            Card card = Card.builder()
+//                    .user(user)
+//                    .account(account)
+//                    .cardNumber(generateCardNumber())
+//                    .cvv(generateCVV())
+//                    .expiryDate(generateExpiryDate())
+//                    .status(Card.CardStatus.ACTIVE)
+//                    .cardType(mapCardType(application.getCardType()))
+//                    .build();
+//
+//            return cardRepo.save(card);
+//
+//        } else {
+//            application.setStatus(CreditCardApplication.ApplicationStatus.REJECTED);
+//            application.setRemarks(remark != null ? remark : "Application rejected");
+//            applicationRepository.save(application);
+//
+//            return null;
+//        }
+//    }
 
 
 

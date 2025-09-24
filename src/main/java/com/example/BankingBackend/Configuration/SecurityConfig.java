@@ -53,18 +53,18 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
-        UserDetails admin = User.withUsername("admin")
-                .password(encoder.encode("1234"))
-                .roles("ADMIN")
-                .build();
-        UserDetails user = User.withUsername("user")
-                .password(encoder.encode("1234"))
-                .roles("USER")
-                .build();
-        return new InMemoryUserDetailsManager(admin, user);
-    }
+//    @Bean
+//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
+//        UserDetails admin = User.withUsername("admin")
+//                .password(encoder.encode("1234"))
+//                .roles("ADMIN")
+//                .build();
+//        UserDetails user = User.withUsername("user")
+//                .password(encoder.encode("1234"))
+//                .roles("USER")
+//                .build();
+//        return new InMemoryUserDetailsManager(admin, user);
+//    }
 
 
 }

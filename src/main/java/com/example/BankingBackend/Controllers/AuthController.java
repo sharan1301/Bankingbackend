@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -46,11 +47,11 @@ public class AuthController {
     public ResponseEntity<?> userLogin(@RequestBody LoginRequestUser userrequest){
         String custId=userrequest.getCustId();
         String password=userrequest.getPassword();
-        var userOptional=usersRepo.findByCustId(custId);
+        List<Users> userOptional=usersRepo.findByCustId(custId);
         if(userOptional.isEmpty()){
             return new ResponseEntity<>("User not registered",HttpStatus.UNAUTHORIZED);
         }
-        Users user=userOptional.get();
+        Users user=userOptional.get(0);
         if(!pwdEncoder.matches(password, user.getPassword())){
             return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
         }

@@ -59,8 +59,6 @@ public class FixedDeposit {
 
     private Integer tenureMonths;
 
-    @Column(name = "AUTO_RENEWAL")
-    private Boolean autoRenewal = false;
 
     @CreationTimestamp
     @Column(name = "CREATED_AT", updatable = false)

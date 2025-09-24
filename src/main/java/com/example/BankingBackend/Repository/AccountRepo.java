@@ -20,10 +20,10 @@ public interface AccountRepo extends JpaRepository<Account,Long> {
     long countByAccountType(Account.AccountType type);
     long countByAccountTypeAndStatus(Account.AccountType type, Account.AccountStatus status);
 
-    //shristi
     Account findByAccountNumber(Long accountNumber);
     List<Account> findByUser_UserId(Long userId);
-
-    //ashok
-//    Optional<Account> findByUser
+    @Query("SELECT a FROM Account a JOIN a.user u " +
+            "WHERE u.aadhaarNumber = :aadhaarNumber AND u.panNumber = :panNumber")
+    List<Account> findByUserAadhaarAndPan(@Param("aadhaarNumber") String aadhaarNumber,
+                                              @Param("panNumber") String panNumber);
 }

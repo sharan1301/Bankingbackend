@@ -27,12 +27,13 @@ public class LoanReqServiceImpl implements LoanReqService {
     AccountRepo accountRepo;
 
     @Override
+
     public LoanRequests createLoanRequest(Integer userId, LoanRequests input) {
 
         Users user = usersRepo.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User with ID " + userId + " not found"));
 
-        Account requestedAccount = input.getAccount(); // Assuming input.account is populated with accountId
+        Account requestedAccount = input.getAccount();
         if (requestedAccount == null || requestedAccount.getAccountId() == null) {
             throw new RuntimeException("No account provided in the request");
         }
@@ -44,6 +45,11 @@ public class LoanReqServiceImpl implements LoanReqService {
             throw new RuntimeException("This account does not belong to the given user");
         }
 
+        if (account.getStatus() != Account.AccountStatus.ACTIVE) {
+            throw new RuntimeException("Loan request cannot be created. Account status is " + account.getStatus());
+        }
+
+
         input.setUser(user);
         input.setAccount(account);
 
@@ -52,6 +58,7 @@ public class LoanReqServiceImpl implements LoanReqService {
         }
         return loanReqRepo.save(input);
     }
+
 
     @Override
     public List<LoanRequests> getPendingLoanReq() {

@@ -21,8 +21,8 @@ public interface UsersRepo extends JpaRepository<Users,Integer> {
     Optional<Users> findByEmail(String email);
     Optional<Users> findByCustIdAndPassword(String userId, String password);
 
-    Optional<Users> findByCustId(String custId);
+    List<Users> findByCustId(String custId);
 
     //ashok
-    Optional<Users> findByAadhaarNumber(String aadhaarNumber);
+    List<Users> findByAadhaarNumber(String aadhaarNumber);
 }
