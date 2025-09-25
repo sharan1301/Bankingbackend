@@ -148,15 +148,26 @@ public class RecurringDepositService {
         double finePending = rd.getFine();
         double actualInstallments=finePending/50.0;
         double x=(rd.getMonthlyInstallment()*actualInstallments) + finePending;
+        Account account = rd.getAccount();
         if (finePending > 0 && amount == x) {
             // Fine is fully cleared
+            if (account.getBalance() < amount) {
+                return "Insufficient balance to pay fine and installment. Required: " + amount;
+            }
+            account.setBalance(account.getBalance() - amount);
+            accountRepository.save(account);
+
             rd.setFine(0.0);
             rd.setTotalDeposited(rd.getTotalDeposited()+(x-finePending));
             double maxDeposit = rd.getMonthlyInstallment() * rd.getTenureMonths();
             if (maxDeposit==(rd.getTotalDeposited()+(x-finePending))){
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
-            rdRepo.save(rd); // Save the fine clearance before returning
+
+            rd.setLastInstallmentDate(paymentDate);
+            rdRepo.save(rd);
+
+            // Save the fine clearance before returning
             return "Fine amount of " + finePending + " and installment amount of "+
                     (x-finePending)+" is cleared.";
         }
@@ -177,6 +188,12 @@ public class RecurringDepositService {
 
         // 6. Update deposited total
         rd.setTotalDeposited(rd.getTotalDeposited() + amount);
+
+        if (account.getBalance() < amount) {
+            return "Insufficient balance to pay installment. Required: " + amount;
+        }
+        account.setBalance(account.getBalance() - amount);
+        accountRepository.save(account);
 
         // 7. Update last installment date
         rd.setLastInstallmentDate(paymentDate);
