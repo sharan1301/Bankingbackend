@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 @CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
@@ -82,17 +83,21 @@ public class AuthController {
 
         String token = jwtUtil.generateTokenWithRole(user.getEmail(), "ROLE_USER");
 
-        // ✅ NEW: Create user data object (exclude sensitive info like password)
-        Map<String, Object> userData = Map.of(
-                "id", user.getUserId(),
-                "custId", user.getCustId(),
-                "name", user.getFirstName(),
-                "email", user.getEmail(),
-                "phone", user.getPhone() != null ? user.getPhone() : "",
-                "accountStatus", user.getStatus()!= null ? user.getStatus() : "ACTIVE",
+        Map<String, Object> userData = new HashMap<>();
+        userData.put("id", user.getUserId());
+        userData.put("custId", user.getCustId());
+        userData.put("email", user.getEmail());
+        userData.put("firstName", user.getFirstName());
+        userData.put("lastName", user.getLastName());
+        userData.put("phone", user.getPhone());
+        userData.put("aadhaarNumber", user.getAadhaarNumber());
+        userData.put("panNumber", user.getPanNumber());
+        userData.put("accountType", user.getAccountType());
+        userData.put("occupation", user.getOccupation());
+        userData.put("annualIncome", user.getAnnualIncome());
+        userData.put("status", user.getStatus());
+        userData.put("lastLoginTime", new Date());
 
-                "lastLoginTime", new Date() // Current login time
-        );
 
         // ✅ MODIFIED: Return token, role, and user data
         return ResponseEntity.ok(Map.of(
