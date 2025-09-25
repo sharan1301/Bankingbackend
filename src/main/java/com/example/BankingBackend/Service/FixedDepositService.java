@@ -23,10 +23,16 @@ public class FixedDepositService {
     public Iterable<FixedDeposit> fetchAllAccounts(LocalDate date) {
 
         for (FixedDeposit fd : fdrepo.findAll()) {
-            if (date.isAfter(fd.getMaturityDate()) || date.isEqual(fd.getMaturityDate())) {
+            if ((date.isAfter(fd.getMaturityDate()) || date.isEqual(fd.getMaturityDate())) &&
+                    (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
+                            fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+
                 fd.setStatus(FixedDeposit.DepositStatus.MATURED);
-            } else if (date.isBefore(fd.getMaturityDate()) && (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
-                    fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+
+            } else if (date.isBefore(fd.getMaturityDate()) &&
+                    (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
+                            fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+
                 fd.setStatus(FixedDeposit.DepositStatus.ACTIVE);
             }
             fdrepo.save(fd);

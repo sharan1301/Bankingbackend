@@ -29,13 +29,17 @@ public class RecurringDepositService {
 
             // 1. Fully paid, no fine, after or on maturity → MATURED
             if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE &&
                     (date.isAfter(maturitydate) || date.isEqual(maturitydate))) {
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
 
             // 2. Fully paid, no fine, before maturity → PAID_WAIT_MATURE
             else if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
-                    date.isBefore(maturitydate)) {
+                    date.isBefore(maturitydate) &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE ) {
                 rd.setStatus(RecurringDeposit.DepositStatus.PAID_WAIT_MATURE);
             }
 
@@ -85,6 +89,7 @@ public class RecurringDepositService {
 
         RecurringDeposit rd = new RecurringDeposit();
         rd.setAccount(account);
+        rd.setUser(account.getUser());
         rd.setMonthlyInstallment(request.getMonthlyInstallment());
         rd.setInterestRate(request.getInterestRate());
         rd.setStartDate(request.getStartDate());
@@ -161,13 +166,13 @@ public class RecurringDepositService {
 
         // 4. Validate installment amount (after clearing fine, must match monthly installment)
         if (!amount.equals(rd.getMonthlyInstallment())) {
-            throw new RuntimeException("Installment amount must be exactly " + rd.getMonthlyInstallment());
+            return "Installment amount must be exactly " + rd.getMonthlyInstallment();
         }
 
         // 5. Prevent overpayment beyond tenure
         double maxDeposit = rd.getMonthlyInstallment() * rd.getTenureMonths();
         if (rd.getTotalDeposited() + amount > maxDeposit) {
-            throw new RuntimeException("Cannot deposit more than total RD amount (" + maxDeposit + ")");
+            return "Cannot deposit more than total RD amount (" + maxDeposit + ")";
         }
 
         // 6. Update deposited total
@@ -240,7 +245,7 @@ public class RecurringDepositService {
         if(rd.getFine()>0){
             return "You should pay all missed Installments and its fine";
         } else if (rd.getStatus()== PAID_WAIT_MATURE) {
-            return "You should wait upto your account got MATURED to withdraw";
+            return "You should wait upto your account got MATURED to withdraw.If it's OK, Penalty will be applied and amount will be withdrawn.";
         } else {
             LocalDate maturityDate = rd.getStartDate().plusMonths(rd.getTenureMonths());
 
