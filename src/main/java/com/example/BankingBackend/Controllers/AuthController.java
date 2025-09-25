@@ -39,7 +39,7 @@ public class AuthController {
               if(!pwdEncoder.matches(password, admin.getPassword())){
                   return new ResponseEntity<>("Invalid Admin",HttpStatus.UNAUTHORIZED);
               }
-              String token=jwtUtil.generateTokenWithRole(admin.getEmail(),"ROLE_ADMIN");
+              String token=jwtUtil.generateTokenWithRole(admin.getFullName(),admin.getEmail(),"ROLE_ADMIN");
               return ResponseEntity.ok(Map.of("token",token,"role","ADMIN"));
     }
     @PostMapping("/auth/userlogin")
@@ -54,7 +54,7 @@ public class AuthController {
         if(!pwdEncoder.matches(password, user.getPassword())){
             return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
         }
-        String token=jwtUtil.generateTokenWithRole(user.getEmail(),"ROLE_USER");
+        String token=jwtUtil.generateTokenWithRole(user.getFirstName(),user.getEmail(),"ROLE_USER");
         return ResponseEntity.ok(Map.of("token",token,"role","USER"));
     }
 

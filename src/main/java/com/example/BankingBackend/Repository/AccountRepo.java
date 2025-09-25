@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -19,5 +20,7 @@ public interface AccountRepo extends JpaRepository<Account,Long> {
     long countByAccountType(Account.AccountType type);
     long countByAccountTypeAndStatus(Account.AccountType type, Account.AccountStatus status);
     Optional<Account> findByAccountNumber(Long accountNumber);
+    @Query("SELECT a FROM Account a WHERE a.user.custId = :custId")
+    List<Account> findAllByCustId(@Param("custId") String custId);
 
 }

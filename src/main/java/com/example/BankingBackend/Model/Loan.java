@@ -61,4 +61,8 @@ public class Loan {
     public enum LoanStatus {
         ACTIVE, CLOSED, DEFAULTED
     }
+
+    public Users getUser() {
+        return user;
+    }
 }

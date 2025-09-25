@@ -104,4 +104,12 @@ public class Account {
     public Long getAccountNumber() {
         return accountNumber;
     }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public Double getBalance() {
+        return balance;
+    }
 }

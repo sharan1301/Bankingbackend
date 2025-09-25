@@ -18,10 +18,11 @@ public class JwtUtil {
     private final long EXPIRATION = 1000 * 60*60;
     private final Key secretkey = Keys.hmacShaKeyFor(SECRET.getBytes(StandardCharsets.UTF_8));
 
-    public String generateTokenWithRole(String email, String role) {
+    public String generateTokenWithRole(String firstName, String email, String role) {
         return Jwts.builder()
                 .setSubject(email)
                 .claim("role", role)
+                .claim("firstName", firstName)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
                 .signWith(secretkey, SignatureAlgorithm.HS256)
@@ -36,6 +37,11 @@ public class JwtUtil {
     public String extractRole(String token) {
         return extractAllClaims(token).get("role", String.class);
     }
+
+    public String extractFirstName(String token) {
+        return extractAllClaims(token).get("firstName", String.class);
+    }
+
 
     public boolean validateJwtToken(String token) {
         try {

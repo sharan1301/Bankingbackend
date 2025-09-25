@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Service
@@ -23,5 +24,10 @@ public class AccountServiceImpl implements AccountService {
         map.put("salaryCount", Long.valueOf(accountRepo.countByAccountType(Account.AccountType.SALARY)));
         map.put("businessCount", Long.valueOf(accountRepo.countByAccountType(Account.AccountType.BUSINESS)));
         return map;
+    }
+
+    @Override
+    public List<Account> getAccountsByCustId(String custId) {
+        return accountRepo.findAllByCustId(custId);
     }
 }

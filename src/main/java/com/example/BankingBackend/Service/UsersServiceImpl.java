@@ -59,7 +59,7 @@ public class UsersServiceImpl implements UsersService{
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Your OTP for Login");
-        message.setText("Hello,\n\nYour OTP for login is: " + otp + "\n\nThis OTP is valid for 5 minutes.");
+        message.setText("Your OTP for login is: " + otp + "\n\nThis OTP is valid for 5 minutes.\n\nPlease do not share this otp with anyone.\n\nIf request was not submitted by you, immediately contact our support team.");
         mailSender.send(message);
 
         System.out.println("OTP sent to " + email + ": " + otp);

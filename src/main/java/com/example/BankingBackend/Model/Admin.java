@@ -43,4 +43,16 @@ public class Admin {
 
     public Admin(){}
 
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
 }

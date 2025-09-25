@@ -12,4 +12,12 @@ public class LoginRequestAdmin {
     private String WorkId;
 //    private String email;
     private String password;
+
+    public String getWorkId() {
+        return WorkId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }

@@ -11,4 +11,12 @@ import lombok.*;
 public class LoginRequestUser {
     private String custId;
     private String password;
+
+    public String getCustId() {
+        return custId;
+    }
+
+    public String getPassword() {
+        return password;
+    }
 }
