@@ -16,6 +16,7 @@ public interface LoanReqRepo extends JpaRepository<LoanRequests,Long> {
     List<LoanRequests> findByStatus(LoanRequests.RequestStatus status);
     boolean existsByUserAndStatus(Users user, LoanRequests.RequestStatus status);
     List<LoanRequests> findByUserUserIdAndStatus(int userId, LoanRequests.RequestStatus status);
+    LoanRequests findByAccountAccountNumberAndStatus(Long accountNumber, LoanRequests.RequestStatus status);
     boolean existsByAccountAndStatus(Account account, LoanRequests.RequestStatus status);
 //    LoanRequests findByUserUserIdAndAccountAccountIdAndStatus(
 //            int userId,

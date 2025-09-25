@@ -25,6 +25,9 @@ public class UsersServiceImpl implements UsersService{
     @Autowired
     JavaMailSender mailSender;
 
+    @Autowired
+    EmailService emailService;
+
     private final Map<String, String> otpStore = new HashMap<>();
 
     @Override
@@ -47,7 +50,7 @@ public class UsersServiceImpl implements UsersService{
     }
 
     @Override
-    public Optional<Users> findByCustId(String custId){
+    public List<Users> findByCustId(String custId){
         return usersRepo.findByCustId(custId);
     }
 
@@ -71,14 +74,28 @@ public class UsersServiceImpl implements UsersService{
     }
 
     public boolean resetPassword(String custId, String newPassword) {
-        Optional<Users> userOpt = usersRepo.findByCustId(custId);
-        if (userOpt.isPresent()) {
-            Users user = userOpt.get();
+        List<Users> users = usersRepo.findByCustId(custId);
+        if (!users.isEmpty()) {
             String hashedPassword = passwordEncoder.encode(newPassword);
-            user.setPassword(hashedPassword);
-            usersRepo.save(user);
+            for (Users user : users) {
+                user.setPassword(hashedPassword);
+            }
+            usersRepo.saveAll(users);
+            // save all users in one batch
+            Users user=users.get(0);
+
+            String subject = "Your Password Has Been Reset";
+            String body = "Dear " + user.getFirstName() + " " + user.getLastName() + ",\n\n"
+                    + "Your account password has been successfully reset.\n"
+                    + "Your new password is: " + newPassword + "\n\n"
+                    + "Please change this password after your first login for security reasons.\n\n"
+                    + "Regards,\n"
+                    + "Banking Support Team";
+
+            emailService.sendEmail(user.getEmail(), subject, body);
             return true;
         }
         return false;
     }
+
 }

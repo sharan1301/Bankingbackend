@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.List;
 
 @RestController
-@RequestMapping("/credit-card")
+@RequestMapping("users/credit-card")
 public class CreditCardApplicationController {
 
     @Autowired
@@ -23,15 +23,15 @@ public class CreditCardApplicationController {
     private CreditCardApplicationRepo repository;
     // User applies for credit card
     @PostMapping("/apply")
-    public CreditCardApplication apply(@RequestBody CreditCardApplication application) {
+    public ResponseEntity<?> apply(@RequestBody CreditCardApplication application) {
         return service.apply(application);
     }
 
     // Get all applications (admin)
-    @GetMapping("/all")
-    public List<CreditCardApplication> getAllApplications() {
-        return service.getAllApplications();
-    }
+//    @GetMapping("/all")
+//    public List<CreditCardApplication> getAllApplications() {
+//        return service.getAllApplications();
+//    }
 
     // Admin approves application and creates card
 //    @PostMapping("/approve/{applicationId}")
@@ -41,28 +41,7 @@ public class CreditCardApplicationController {
 //        return service.approveApplication(applicationId, userId, accountNo);
 //    }
 
-    @PostMapping("/{applicationId}/handle")
-    public ResponseEntity<ApplicationResponseDTO> handleApplication(
-            @PathVariable Long applicationId,
-            @RequestParam boolean approve,
-            @RequestParam(required = false) String remarks) {
 
-        Card card = service.handleApplication(applicationId, approve, remarks);
-
-        CreditCardApplication application = repository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("Application not found"));
-
-        CardDTO cardDTO = (card != null) ? new CardDTO(card) : null;
-
-        return ResponseEntity.ok(
-                new ApplicationResponseDTO(
-                        application.getApplicationId(),
-                        application.getStatus().name(),
-                        application.getRemarks(),
-                        cardDTO
-                )
-        );
-    }
 
 
 

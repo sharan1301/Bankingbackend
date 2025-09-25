@@ -4,15 +4,13 @@ import com.example.BankingBackend.Model.*;
 import com.example.BankingBackend.Repository.AccountRepo;
 import com.example.BankingBackend.Repository.LoanReqRepo;
 import com.example.BankingBackend.Repository.UsersRepo;
-import com.example.BankingBackend.Service.Exception.AccountNotFound;
 import com.example.BankingBackend.Service.Exception.LoanRequestNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 
 @Service
 public class LoanReqServiceImpl implements LoanReqService {
@@ -25,20 +23,24 @@ public class LoanReqServiceImpl implements LoanReqService {
     AccountRepo accountRepo;
 
 
+
+
     @Override
-    public void createLoanRequest(Map<String, Object> requestBody) {
+    public ResponseEntity<?> createLoanRequest(Map<String, Object> requestBody) {
 
         Long accountNumber = Long.valueOf(requestBody.get("accountNumber").toString());
         String loanTypeStr = requestBody.get("loanType").toString();
         Double loanAmount = Double.valueOf(requestBody.get("loanAmount").toString());
         Integer tenureMonths = Integer.valueOf(requestBody.get("tenureMonths").toString());
 
-        Optional<Account> accountOpt = accountRepo.findByAccountNumber(accountNumber);
-        if (accountOpt.isEmpty()) {
+        Account account = accountRepo.findAccountByAccountNumber(accountNumber);
+        if (account==null) {
             throw new RuntimeException("Account not found.");
         }
-
-        Account account = accountOpt.get();
+        if (account.getStatus() != Account.AccountStatus.ACTIVE) {
+            throw new RuntimeException("Loan request cannot be created. Account status is " + account.getStatus());
+        }
+//        Account account = accountOpt.get();
         Users user = account.getUser();
 
         boolean pendingExists = loanReqRepo.existsByAccountAndStatus(account, LoanRequests.RequestStatus.PENDING);
@@ -54,6 +56,10 @@ public class LoanReqServiceImpl implements LoanReqService {
         loanRequest.setTenureMonths(tenureMonths);
 
         loanReqRepo.save(loanRequest);
+        return ResponseEntity.ok(
+                Map.of("Loan request", loanRequest)
+        );
+
     }
 
     @Override
@@ -71,5 +77,3 @@ public class LoanReqServiceImpl implements LoanReqService {
     }
 
 }
-
-

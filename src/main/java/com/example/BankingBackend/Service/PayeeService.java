@@ -12,7 +12,7 @@ public interface PayeeService {
 
     Payee addPayee(Payee payee);
     Payee updatePayee(Payee payee);
-    void deletePayee(int payeeId);
+    boolean deletePayee(int payeeId);
     Optional<Payee> getPayeeById(int payeeId);
      List<Payee> getAllPayees();
     Payee addPayee(Payee payee, Long accountId);

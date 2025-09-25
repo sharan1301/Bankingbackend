@@ -35,7 +35,7 @@ public class AutopayController {
         LocalDateTime endDate = request.containsKey("endDate") ?
                 LocalDateTime.parse(request.get("endDate").toString()) : null;
 
-        Account sender = accountRepository.findByAccountNumber(senderAccNo);
+        Account sender = accountRepository.findAccountByAccountNumber(senderAccNo);
         if (sender == null) throw new RuntimeException("Sender account not found");
 
         Payee receiver = payeeRepository.findByPayeeAccNo(receiverPayeeAccNo);

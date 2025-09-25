@@ -44,7 +44,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://127.0.0.1:5500", "http://localhost:5501"));
+        // Use allowedOriginPatterns instead of allowedOrigins
+        configuration.setAllowedOriginPatterns(List.of("http://127.0.0.1:5501"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
@@ -53,18 +54,8 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-//    @Bean
-//    public InMemoryUserDetailsManager userDetailsService(PasswordEncoder encoder) {
-//        UserDetails admin = User.withUsername("admin")
-//                .password(encoder.encode("1234"))
-//                .roles("ADMIN")
-//                .build();
-//        UserDetails user = User.withUsername("user")
-//                .password(encoder.encode("1234"))
-//                .roles("USER")
-//                .build();
-//        return new InMemoryUserDetailsManager(admin, user);
-//    }
+
+
 
 
 }

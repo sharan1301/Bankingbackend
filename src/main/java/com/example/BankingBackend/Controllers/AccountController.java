@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("users/accounts")
 public class AccountController {
 
     @Autowired
@@ -37,4 +37,23 @@ public class AccountController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+//    @GetMapping("/by-custid/{custId}")
+//    public ResponseEntity<Account> getAccountByCustId(@PathVariable String custId) {
+//        Account account = accountService.getAccountByCustId(custId);
+//        if (account != null) {
+//            return ResponseEntity.ok(account);
+//        } else {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+//        }
+//    }
+    @GetMapping("/by-custid/{custId}")
+    public ResponseEntity<List<Account>> getAccountByCustId(@PathVariable String custId) {
+        List<Account> accounts = accountService.getAccountByCustId(custId);
+        if (!accounts.isEmpty()) {
+            return ResponseEntity.ok(accounts);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
 }

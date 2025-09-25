@@ -20,8 +20,8 @@ public class AdminDashboardController {
     UsersService usersService;
     @Autowired
     UserReqService userReqService;
-   @Autowired
-   AccountService accountService;
+    @Autowired
+    AccountService accountService;
     @GetMapping("/dashboard/users-stats")
     public Map<String, Long> userStats(){
         Map<String, Long> response = new HashMap<>();

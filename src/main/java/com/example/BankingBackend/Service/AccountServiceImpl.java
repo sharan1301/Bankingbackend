@@ -40,4 +40,8 @@ public class AccountServiceImpl implements AccountService {
     public Account createAcc(Account account) {
         return null;
     }
+    @Override
+    public List<Account> getAccountByCustId(String custId) {
+        return accountRepo.findByUserCustId(custId);
+    }
 }

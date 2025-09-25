@@ -27,12 +27,12 @@ public class TransactionService {
 
 
     public Transaction saveBankTransfer(Transaction request) {
-        Account sender = accountRepository.findByAccountNumber(request.getAccount().getAccountNumber());
+        Account sender = accountRepository.findAccountByAccountNumber(request.getAccount().getAccountNumber());
         if (sender == null) {
             throw new RuntimeException("Sender account not found");
         }
 
-        Account receiver = accountRepository.findByAccountNumber(request.getRecvAcc().getAccountNumber());
+        Account receiver = accountRepository.findAccountByAccountNumber(request.getRecvAcc().getAccountNumber());
         if (receiver == null) {
             throw new RuntimeException("Receiver account not found");
         }
@@ -67,8 +67,8 @@ public class TransactionService {
 
     // -------------------- SELF TRANSFER --------------------
     public Transaction saveSelfTransfer(Transaction transfer) {
-        Account fromAccount = accountRepository.findByAccountNumber(transfer.getAccount().getAccountNumber());
-        Account toAccount = accountRepository.findByAccountNumber(transfer.getRecvAcc().getAccountNumber());
+        Account fromAccount = accountRepository.findAccountByAccountNumber(transfer.getAccount().getAccountNumber());
+        Account toAccount = accountRepository.findAccountByAccountNumber(transfer.getRecvAcc().getAccountNumber());
 
         if (transfer.getAccount().getUser().getEmail() != transfer.getRecvAcc().getUser().getEmail() || transfer.getAmount() <= 0) {
             transfer.setStatus(Transaction.TransactionStatus.valueOf("FAILED"));
@@ -92,7 +92,7 @@ public class TransactionService {
 
     public Transaction savePayeeTransfer(Transaction transfer) {
         // Fetch the sender and receiver accounts
-        Account fromAccount = accountRepository.findByAccountNumber(transfer.getAccount().getAccountNumber());
+        Account fromAccount = accountRepository.findAccountByAccountNumber(transfer.getAccount().getAccountNumber());
         Account toAccount = payeeRepository.findByPayeeAccNo(transfer.getRecvAcc().getAccountNumber()).getAccount();
 
         if (fromAccount == null) {
@@ -177,17 +177,17 @@ public class TransactionService {
     public Account getAccountByAccNo(Long fromAccNo) {
 
         System.out.println("Fund transfer service......." + fromAccNo);
-        return accountRepository.findByAccountNumber(fromAccNo);
+        return accountRepository.findAccountByAccountNumber(fromAccNo);
     }
 
     public void createTransaction(Long senderAccountNumber, Long receiverAccountNumber, double amount) {
         // Step 1: Find the sender and receiver accounts
-        Account senderAccount = accountRepository.findByAccountNumber(senderAccountNumber);
+        Account senderAccount = accountRepository.findAccountByAccountNumber(senderAccountNumber);
         if (senderAccount == null) {
             throw new RuntimeException("Sender account not found");
         }
 
-        Account receiverAccount = accountRepository.findByAccountNumber(receiverAccountNumber);
+        Account receiverAccount = accountRepository.findAccountByAccountNumber(receiverAccountNumber);
         if (receiverAccount == null) {
             throw new RuntimeException("Receiver account not found");
         }

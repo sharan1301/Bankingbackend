@@ -89,6 +89,10 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Payee> payees;
 
+    @OneToMany(mappedBy = "account")
+    @JsonIgnore
+    private List<CreditCardApplication> applications;
+
     public enum AccountType {
         SAVINGS, CURRENT, SALARY, NRI, JOINT , BUSINESS
     }

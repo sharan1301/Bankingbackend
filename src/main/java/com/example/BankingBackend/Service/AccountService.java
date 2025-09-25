@@ -14,4 +14,5 @@ public interface AccountService {
     Account getAccountById(Long accountId);
 
     Account createAcc(Account account);
+     List<Account> getAccountByCustId(String custId);
 }

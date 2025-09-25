@@ -16,7 +16,7 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/users/FixedDeposit")
-@CrossOrigin(origins = "http://127.0.0.1:5500", allowedHeaders = "*", allowCredentials = "true")
+@CrossOrigin(origins = "http://127.0.0.1:5501", allowedHeaders = "*", allowCredentials = "true")
 
 public class FixedDepositController {
     private static final Logger logger = LoggerFactory.getLogger(FixedDepositController.class);

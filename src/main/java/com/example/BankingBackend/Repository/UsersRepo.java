@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface UsersRepo extends JpaRepository<Users,Integer> {
-    Optional<Users> findByEmailIgnoreCase(String email);
+    List<Users> findByEmailIgnoreCase(String email);
 
     Optional<Users> findByPassword(String password);
     @Query(value = "SELECT * FROM users WHERE aadhaar_number = :aadhaarNumber AND pan_number = :panNumber", nativeQuery = true)

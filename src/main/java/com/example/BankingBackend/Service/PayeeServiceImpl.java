@@ -66,9 +66,12 @@ public class PayeeServiceImpl implements PayeeService {
     }
 
     @Override
-    public void deletePayee(int payeeId) {
-
-        payeeRepository.deleteById(payeeId);
+    public boolean deletePayee(int payeeId) {
+        if (payeeRepository.existsById(payeeId)) {
+            payeeRepository.deleteById(payeeId);
+            return true;
+        }
+        return false;
     }
 
     @Override

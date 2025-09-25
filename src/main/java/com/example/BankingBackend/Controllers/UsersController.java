@@ -39,34 +39,23 @@ public class UsersController {
         return ResponseEntity.ok("Login successful via OTP.");
     }
 
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Users users) {
-        String custId = users.getCustId();
-        String rawPassword = users.getPassword();
+//    @PostMapping("/login")
+//    public ResponseEntity<?> login(@RequestBody Users users) {
+//        String custId = users.getCustId();
+//        String rawPassword = users.getPassword();
+//
+//        Optional<Users> userOpt = usersService.findByCustId(custId);
+//        if (userOpt.isEmpty()) {
+//            return ResponseEntity.badRequest().body("Invalid UserId or Password.");
+//        }
+//        Users user = userOpt.get();
+//
+//        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+//            return ResponseEntity.badRequest().body("Invalid UserId or Password.");
+//        }
+//
+//        return ResponseEntity.ok("Login successful via UserId+Password.");
+//    }
 
-        Optional<Users> userOpt = usersService.findByCustId(custId);
-        if (userOpt.isEmpty()) {
-            return ResponseEntity.badRequest().body("Invalid UserId or Password.");
-        }
-        Users user = userOpt.get();
-
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            return ResponseEntity.badRequest().body("Invalid UserId or Password.");
-        }
-
-        return ResponseEntity.ok("Login successful via UserId+Password.");
-    }
-
-    @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(
-            @RequestParam String custId,
-            @RequestParam String newPassword) {
-        boolean updated = usersService.resetPassword(custId, newPassword);
-        if (updated) {
-            return ResponseEntity.ok("Password updated successfully.");
-        } else {
-            return ResponseEntity.badRequest().body("Invalid username.");
-        }
-    }
 
 }

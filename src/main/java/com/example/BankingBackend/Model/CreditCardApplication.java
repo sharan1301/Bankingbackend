@@ -1,11 +1,9 @@
 package com.example.BankingBackend.Model;
 
 import javax.persistence.*;
-import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,10 +23,23 @@ public class CreditCardApplication {
     @Column(unique = true, nullable = false)
     private String applicationId;   // e.g., CRD20250916862
 
+    // --- Foreign Key (Account) ---
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JsonIgnore
+    @JoinColumn(
+            name = "ACCOUNT_ID",
+            referencedColumnName = "ACCOUNT_ID",
+            foreignKey = @ForeignKey(name = "FK_CC_APP_ACCOUNT"),
+            nullable = false
+    )
+    private Account account;
+
+    // --- Transient field to accept account number from JSON ---
+    @Transient
+    private Long accountNumber;
+
     // --- Personal Information ---
     private String fullName;
-    private String dateOfBirth;
-    private String gender;
 
     @Column(nullable = false)
     private String mobileNumber;
@@ -42,20 +53,12 @@ public class CreditCardApplication {
     @Column(nullable = false)
     private String aadhaarNumber;
 
-    private String pincode;
-    private String address;
-    private String city;
-    private String state;
-
     private String occupation;
     private Double annualIncome;
-    private String employer;
 
     // --- Card Preferences ---
     @Enumerated(EnumType.STRING)
     private CardType cardType;
-
-
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
@@ -69,8 +72,7 @@ public class CreditCardApplication {
     private LocalDateTime submittedAt;
     private LocalDateTime approvedAt;
 
-    // --------- ENUMS INSIDE SAME FILE ---------
-
+    // --------- ENUMS ---------
     public enum ApplicationStatus {
         UNDER_REVIEW, APPROVED, REJECTED
     }
@@ -79,15 +81,14 @@ public class CreditCardApplication {
         PLATINUM, GOLD, CLASSIC
     }
 
+    public enum PaymentMethod {
+        AUTO, MANUAL
+    }
+
     @PrePersist
     public void generateApplicationId() {
         if (this.applicationId == null || this.applicationId.isEmpty()) {
             this.applicationId = "CRD" + System.currentTimeMillis();
         }
-    }
-
-
-    public enum PaymentMethod {
-        AUTO, MANUAL
     }
 }

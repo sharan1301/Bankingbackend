@@ -1,9 +1,8 @@
 package com.example.BankingBackend.Controllers;
 
 import com.example.BankingBackend.Model.*;
-import com.example.BankingBackend.Service.AdminService;
-import com.example.BankingBackend.Service.LoanReqService;
-import com.example.BankingBackend.Service.UserReqService;
+import com.example.BankingBackend.Repository.CreditCardApplicationRepo;
+import com.example.BankingBackend.Service.*;
 import com.example.BankingBackend.Service.UserReqService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +24,10 @@ public class AdminController {
     UserReqService userRequestsService;
     @Autowired
     LoanReqService loanReqService;
+    @Autowired
+    CreditCardApplicationService creditCardApplicationService;
+    @Autowired
+    CreditCardApplicationRepo repository;
     @GetMapping("/profile")
     public ResponseEntity<?> adminProfile(Authentication authentication){
         return adminService.adminProfile(authentication);
@@ -68,8 +71,47 @@ public class AdminController {
         return adminService.declineLoan(id);
 
     }
+    @GetMapping("/pending-creditcard-requests")
+    public List<CreditCardApplication> getAllPendingCardReq(){
+        return adminService.getAllPendingCardReq();
 
+    }
+    @PutMapping("/creditcard-requests/{applicationId}/handle")
+    public ResponseEntity<ApplicationResponseDTO> handleApplication(
+            @PathVariable Long applicationId) {
 
+        Card card = creditCardApplicationService.handleApplication(applicationId);
+
+        CreditCardApplication application = repository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        CardDTO cardDTO = (card != null) ? new CardDTO(card) : null;
+
+        return ResponseEntity.ok(
+                new ApplicationResponseDTO(
+                        application.getApplicationId(),
+                        application.getStatus().name(),
+                        cardDTO
+                )
+        );
+    }
+    @PutMapping("/creditcard-requests/{applicationId}/reject")
+    public ResponseEntity<ApplicationResponseDTO> rejectApplication(
+            @PathVariable Long applicationId) {
+
+        creditCardApplicationService.rejectApplication(applicationId);
+
+        CreditCardApplication application = repository.findById(applicationId)
+                .orElseThrow(() -> new RuntimeException("Application not found"));
+
+        return ResponseEntity.ok(
+                new ApplicationResponseDTO(
+                        application.getApplicationId(),
+                        application.getStatus().name(),
+                        null
+                )
+        );
+    }
 
 
 }

@@ -33,6 +33,8 @@ public class AdminService {
     @Autowired
     AccountRepo accountRepo;
     @Autowired
+    CreditCardApplicationRepo creditCardApplicationRepo;
+    @Autowired
     LoanRepo loanRepo;
     @Autowired
     EmailService emailService;
@@ -311,4 +313,10 @@ public class AdminService {
         }
 
     }
+
+    public List<CreditCardApplication> getAllPendingCardReq() {
+        return creditCardApplicationRepo.findByStatus(CreditCardApplication.ApplicationStatus.UNDER_REVIEW);
+    }
+
+
 }

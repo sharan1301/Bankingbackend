@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = {"http://127.0.0.1:5501", "http://localhost:5501"})
 @RestController
-@RequestMapping("/payees")
+@RequestMapping("users/payees")
 public class PayeeController {
 
     @Autowired
@@ -31,7 +31,7 @@ public class PayeeController {
         return new ResponseEntity<>(savedPayee, HttpStatus.CREATED);
     }
 
-//    @PostMapping("/delete")
+
 @PostMapping("/update/{payeeId}")
 public ResponseEntity<Payee> updatePayee(@PathVariable int payeeId, @RequestBody Payee payee) {
     Optional<Payee> existingPayeeOpt = payeeService.getPayeeById(payeeId);
@@ -68,5 +68,14 @@ public ResponseEntity<Payee> updatePayee(@PathVariable int payeeId, @RequestBody
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
+    }
+    @DeleteMapping("/delete/{payeeId}")
+    public ResponseEntity<?> deletePayee(@PathVariable int payeeId) {
+        boolean deleted = payeeService.deletePayee(payeeId);
+        if (deleted) {
+            return ResponseEntity.ok(" Payee Deleted"); // 204 No Content
+        } else {
+            return ResponseEntity.notFound().build(); // 404 Not Found
+        }
     }
 }
