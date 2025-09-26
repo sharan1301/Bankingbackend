@@ -1,29 +1,38 @@
 package com.example.BankingBackend.Controllers;
 
 import com.example.BankingBackend.Model.Account;
+import com.example.BankingBackend.Model.Loan;
+import com.example.BankingBackend.Model.Transaction;
+import com.example.BankingBackend.Model.Users;
+import com.example.BankingBackend.Repository.LoanRepo;
+import com.example.BankingBackend.Repository.UsersRepo;
 import com.example.BankingBackend.Service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
 public class UserDashboardController {
 
     @Autowired
-    private AccountService accountService;
+    AccountService accountService;
 
-    @GetMapping("/{custId}/accounts")
-    public ResponseEntity<?> getAccountsForCust(@PathVariable String custId) {
+    @Autowired
+    UsersRepo usersRepo;
+
+    @Autowired
+    LoanRepo loanRepo;
+
+    @Autowired
+    TransactionService transactionService;
+
+    @GetMapping("/accounts")
+    public ResponseEntity<?> getAccountsForCust(@RequestParam String custId) {
         List<Account> accounts = accountService.getAccountsByCustId(custId);
 
         if (accounts.isEmpty()) {
@@ -43,4 +52,28 @@ public class UserDashboardController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @GetMapping("/status")
+    public ResponseEntity<List<Loan>> getLoanStatus(@RequestParam String custId) {
+        List<Users> usersList = usersRepo.findAllByCustId(custId);
+        if (usersList.isEmpty()) {
+            return ResponseEntity.ok(Collections.emptyList());
+        }
+        List<Integer> userIds = usersList.stream()
+                .map(Users::getUserId)
+                .collect(Collectors.toList());
+        List<Loan> loans = loanRepo.findLoansByUserIds(userIds);
+        return ResponseEntity.ok(loans);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Transaction>> getTransactions(@RequestParam Long custId) {
+        List<Transaction> transactions = transactionService.getTransactionsByCustId(custId);
+        return ResponseEntity.ok(transactions);
+    }
+
+
+
+
 }

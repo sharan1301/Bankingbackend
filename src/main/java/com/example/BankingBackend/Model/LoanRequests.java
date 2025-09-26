@@ -98,5 +98,7 @@ public class LoanRequests {
         return status;
     }
 
-
+    public void setStatus(RequestStatus status) {
+        this.status = status;
+    }
 }

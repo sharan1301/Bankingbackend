@@ -55,4 +55,20 @@ public class Admin {
     public String getFullName() {
         return fullName;
     }
+
+    public int getAdminId() {
+        return adminId;
+    }
+
+    public String getWorkId() {
+        return workId;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public String getRole() {
+        return role;
+    }
 }

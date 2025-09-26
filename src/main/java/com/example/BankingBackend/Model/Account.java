@@ -112,4 +112,88 @@ public class Account {
     public Double getBalance() {
         return balance;
     }
+
+    public Long getAccountId() {
+        return accountId;
+    }
+
+    public AccountStatus getStatus() {
+        return status;
+    }
+
+    public void setAccountId(Long accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setUser(Users user) {
+        this.user = user;
+    }
+
+    public void setAccountNumber(Long accountNumber) {
+        this.accountNumber = accountNumber;
+    }
+
+    public void setAccountType(AccountType accountType) {
+        this.accountType = accountType;
+    }
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+    }
+
+    public void setPin(String pin) {
+        this.pin = pin;
+    }
+
+    public void setBranchCode(String branchCode) {
+        this.branchCode = branchCode;
+    }
+
+    public void setIfscCode(String ifscCode) {
+        this.ifscCode = ifscCode;
+    }
+
+    public void setCreatedDate(LocalDate createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public void setStatus(AccountStatus status) {
+        this.status = status;
+    }
+
+    public void setMinimumBalance(Double minimumBalance) {
+        this.minimumBalance = minimumBalance;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public void setTransactions(List<Transaction> transactions) {
+        this.transactions = transactions;
+    }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
+    }
+
+    public void setLoans(List<Loan> loans) {
+        this.loans = loans;
+    }
+
+    public void setFixedDeposits(List<FixedDeposit> fixedDeposits) {
+        this.fixedDeposits = fixedDeposits;
+    }
+
+    public void setRecurringDeposits(List<RecurringDeposit> recurringDeposits) {
+        this.recurringDeposits = recurringDeposits;
+    }
+
+    public void setPayees(List<Payee> payees) {
+        this.payees = payees;
+    }
 }

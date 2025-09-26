@@ -22,5 +22,11 @@ public interface AccountRepo extends JpaRepository<Account,Long> {
     Optional<Account> findByAccountNumber(Long accountNumber);
     @Query("SELECT a FROM Account a WHERE a.user.custId = :custId")
     List<Account> findAllByCustId(@Param("custId") String custId);
+    Account findAllByAccountNumber(Long accountNumber);
+    @Query("SELECT u.userId FROM User u WHERE u.custId = :custId")
+    List<Long> findUserIdsByCustId(@Param("custId") Long custId);
+
+    @Query("SELECT a.accountId FROM Account a WHERE a.userId IN :userIds")
+    List<Long> findAccountIdsByUserIds(@Param("userIds") List<Long> userIds);
 
 }

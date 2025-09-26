@@ -93,4 +93,20 @@ public class UserRequests {
     public String getEmail() {
         return email;
     }
+
+    public int getRequestId() {
+        return requestId;
+    }
+
+    public String getOccupation() {
+        return occupation;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public Double getAnnualIncome() {
+        return annualIncome;
+    }
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -43,19 +44,31 @@ public class AuthController {
               return ResponseEntity.ok(Map.of("token",token,"role","ADMIN"));
     }
     @PostMapping("/auth/userlogin")
-    public ResponseEntity<?> userLogin(@RequestBody LoginRequestUser userrequest){
-        String custId=userrequest.getCustId();
-        String password=userrequest.getPassword();
-        var userOptional=usersRepo.findByCustId(custId);
-        if(userOptional.isEmpty()){
-            return new ResponseEntity<>("User not registered",HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<?> userLogin(@RequestBody LoginRequestUser userrequest) {
+        String custId = userrequest.getCustId();
+        String password = userrequest.getPassword();
+
+        // Fetch all accounts for this custId
+        List<Users> usersList = usersRepo.findAllByCustId(custId);
+        if (usersList.isEmpty()) {
+            return new ResponseEntity<>("User not registered", HttpStatus.UNAUTHORIZED);
         }
-        Users user=userOptional.get();
-        if(!pwdEncoder.matches(password, user.getPassword())){
-            return new ResponseEntity<>("Invalid User",HttpStatus.UNAUTHORIZED);
+
+        // Use first user for password verification
+        Users firstUser = usersList.get(0);
+        if (!pwdEncoder.matches(password, firstUser.getPassword())) {
+            return new ResponseEntity<>("Invalid User", HttpStatus.UNAUTHORIZED);
         }
-        String token=jwtUtil.generateTokenWithRole(user.getFirstName(),user.getEmail(),"ROLE_USER");
-        return ResponseEntity.ok(Map.of("token",token,"role","USER"));
+
+        // Generate JWT token
+        String token = jwtUtil.generateTokenWithRole(firstUser.getFirstName(), firstUser.getEmail(), "ROLE_USER");
+
+        // Return token and all accounts
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "role", "USER",
+                "accounts", usersList
+        ));
     }
 
 }
