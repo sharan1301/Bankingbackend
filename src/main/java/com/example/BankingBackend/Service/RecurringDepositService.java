@@ -29,13 +29,17 @@ public class RecurringDepositService {
 
             // 1. Fully paid, no fine, after or on maturity → MATURED
             if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE &&
                     (date.isAfter(maturitydate) || date.isEqual(maturitydate))) {
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
 
             // 2. Fully paid, no fine, before maturity → PAID_WAIT_MATURE
             else if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
-                    date.isBefore(maturitydate)) {
+                    date.isBefore(maturitydate) &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE ) {
                 rd.setStatus(RecurringDeposit.DepositStatus.PAID_WAIT_MATURE);
             }
 
@@ -85,6 +89,7 @@ public class RecurringDepositService {
 
         RecurringDeposit rd = new RecurringDeposit();
         rd.setAccount(account);
+        rd.setUser(account.getUser());
         rd.setMonthlyInstallment(request.getMonthlyInstallment());
         rd.setInterestRate(request.getInterestRate());
         rd.setStartDate(request.getStartDate());
@@ -143,15 +148,26 @@ public class RecurringDepositService {
         double finePending = rd.getFine();
         double actualInstallments=finePending/50.0;
         double x=(rd.getMonthlyInstallment()*actualInstallments) + finePending;
+        Account account = rd.getAccount();
         if (finePending > 0 && amount == x) {
             // Fine is fully cleared
+            if (account.getBalance() < amount) {
+                return "Insufficient balance to pay fine and installment. Required: " + amount;
+            }
+            account.setBalance(account.getBalance() - amount);
+            accountRepository.save(account);
+
             rd.setFine(0.0);
             rd.setTotalDeposited(rd.getTotalDeposited()+(x-finePending));
             double maxDeposit = rd.getMonthlyInstallment() * rd.getTenureMonths();
             if (maxDeposit==(rd.getTotalDeposited()+(x-finePending))){
                 rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
             }
-            rdRepo.save(rd); // Save the fine clearance before returning
+
+            rd.setLastInstallmentDate(paymentDate);
+            rdRepo.save(rd);
+
+            // Save the fine clearance before returning
             return "Fine amount of " + finePending + " and installment amount of "+
                     (x-finePending)+" is cleared.";
         }
@@ -161,17 +177,23 @@ public class RecurringDepositService {
 
         // 4. Validate installment amount (after clearing fine, must match monthly installment)
         if (!amount.equals(rd.getMonthlyInstallment())) {
-            throw new RuntimeException("Installment amount must be exactly " + rd.getMonthlyInstallment());
+            return "Installment amount must be exactly " + rd.getMonthlyInstallment();
         }
 
         // 5. Prevent overpayment beyond tenure
         double maxDeposit = rd.getMonthlyInstallment() * rd.getTenureMonths();
         if (rd.getTotalDeposited() + amount > maxDeposit) {
-            throw new RuntimeException("Cannot deposit more than total RD amount (" + maxDeposit + ")");
+            return "Cannot deposit more than total RD amount (" + maxDeposit + ")";
         }
 
         // 6. Update deposited total
         rd.setTotalDeposited(rd.getTotalDeposited() + amount);
+
+        if (account.getBalance() < amount) {
+            return "Insufficient balance to pay installment. Required: " + amount;
+        }
+        account.setBalance(account.getBalance() - amount);
+        accountRepository.save(account);
 
         // 7. Update last installment date
         rd.setLastInstallmentDate(paymentDate);
@@ -240,7 +262,7 @@ public class RecurringDepositService {
         if(rd.getFine()>0){
             return "You should pay all missed Installments and its fine";
         } else if (rd.getStatus()== PAID_WAIT_MATURE) {
-            return "You should wait upto your account got MATURED to withdraw";
+            return "You should wait upto your account got MATURED to withdraw.If it's OK, Penalty will be applied and amount will be withdrawn.";
         } else {
             LocalDate maturityDate = rd.getStartDate().plusMonths(rd.getTenureMonths());
 

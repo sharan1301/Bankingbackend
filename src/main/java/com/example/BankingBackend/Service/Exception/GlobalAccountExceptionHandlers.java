@@ -4,10 +4,14 @@ import com.example.BankingBackend.Service.Exception.ErrorResponse;
 import com.example.BankingBackend.Service.Exception.UserRequestNotFound;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @ControllerAdvice
 public class GlobalAccountExceptionHandlers {
@@ -26,6 +30,15 @@ public class GlobalAccountExceptionHandlers {
     public @ResponseBody ErrorResponse handleDataIntegrityViolation(DataIntegrityViolationException ex) {
         String message = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
         return new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message);
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<Map<String, String>> handleRuntimeException(RuntimeException ex) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST) // or 400/404 depending
+                .body(error);
     }
 
     @ExceptionHandler(value = FDAccountAlreadyExists.class)
