@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 @Service
 public class FixedDepositService {
@@ -39,6 +40,30 @@ public class FixedDepositService {
         }
         return fdrepo.findAll();
     }
+
+
+    public Iterable<FixedDeposit> fetchAllAccountsByUser(Long userId, LocalDate date) {
+        List<FixedDeposit> fdList = fdrepo.findByUser_UserId(userId);
+
+        for (FixedDeposit fd : fdList) {
+            if ((date.isAfter(fd.getMaturityDate()) || date.isEqual(fd.getMaturityDate())) &&
+                    (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
+                            fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+
+                fd.setStatus(FixedDeposit.DepositStatus.MATURED);
+
+            } else if (date.isBefore(fd.getMaturityDate()) &&
+                    (fd.getStatus() != FixedDeposit.DepositStatus.CLOSED &&
+                            fd.getStatus() != FixedDeposit.DepositStatus.PREMATURE_CLOSURE)) {
+
+                fd.setStatus(FixedDeposit.DepositStatus.ACTIVE);
+            }
+            fdrepo.save(fd);
+        }
+        return fdrepo.findByUser_UserId(userId);
+    }
+
+
 
     public FixedDeposit AddingAcc(int userId, FixedDeposit request) {
         logger.info("Adding FD for account: {}", request.getAccount().getAccountId());

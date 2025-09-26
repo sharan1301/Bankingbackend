@@ -36,6 +36,14 @@ public class FixedDepositController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedFd);
     }
 
+
+    @GetMapping("/fdshowall/{userId}")
+    public ResponseEntity<?> getFDsByUser(@PathVariable Long userId,
+                                          @RequestParam("date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(fdservice.fetchAllAccountsByUser(userId, date));
+    }
+
+
     @GetMapping("/showaccounts")
     public ResponseEntity<Iterable<Account>> showAccounts() {
         return ResponseEntity.ok(fdservice.getAllAccounts());

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 
 import static com.example.BankingBackend.Model.RecurringDeposit.DepositStatus.PAID_WAIT_MATURE;
 
@@ -61,6 +62,53 @@ public class RecurringDepositService {
 
         return rdRepo.findAll();
     }
+
+
+    public Iterable<RecurringDeposit> fetchAllAccountsWithFine(Long userId, LocalDate date) {
+        List<RecurringDeposit> rdList = rdRepo.findByUser_UserId(userId);
+
+        for (RecurringDeposit rd : rdList) {
+            applyMissedInstallmentFine(rd, date);
+            LocalDate maturitydate = rd.getMaturityDate();
+            double totalDue = rd.getMonthlyInstallment() * rd.getTenureMonths();
+
+            // 1. Fully paid, no fine, after or on maturity → MATURED
+            if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE &&
+                    (date.isAfter(maturitydate) || date.isEqual(maturitydate))) {
+                rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
+            }
+
+            // 2. Fully paid, no fine, before maturity → PAID_WAIT_MATURE
+            else if (rd.getTotalDeposited() == totalDue && rd.getFine() == 0 &&
+                    date.isBefore(maturitydate) &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE) {
+                rd.setStatus(RecurringDeposit.DepositStatus.PAID_WAIT_MATURE);
+            }
+
+            // 3. Not fully paid, before maturity → ACTIVE
+            else if (rd.getTotalDeposited() < totalDue &&
+                    date.isBefore(maturitydate) &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.CLOSED &&
+                    rd.getStatus() != RecurringDeposit.DepositStatus.PREMATURE_CLOSURE) {
+                rd.setStatus(RecurringDeposit.DepositStatus.ACTIVE);
+            }
+
+            // 4. Fully paid, after maturity but previously PAID_WAIT_MATURE → MATURED
+            else if (rd.getTotalDeposited() == totalDue &&
+                    rd.getStatus() == RecurringDeposit.DepositStatus.PAID_WAIT_MATURE) {
+                rd.setStatus(RecurringDeposit.DepositStatus.MATURED);
+            }
+
+            rdRepo.save(rd);
+        }
+
+        return rdRepo.findByUser_UserId(userId);
+    }
+
+
 
     public RecurringDeposit AddingAcc(int userId,RecurringDeposit request) {
         Account account = accountRepository.findById(request.getAccount().getAccountId())

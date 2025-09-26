@@ -41,6 +41,14 @@ public class RecurringDepositController {
         return ResponseEntity.ok(rdService.fetchAllAccountswithfine(date));
     }
 
+    @GetMapping("/rdshowall/{userId}")
+    public ResponseEntity<?> getAllRDAccountsByUser(
+            @PathVariable Long userId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
+        return ResponseEntity.ok(rdService.fetchAllAccountsWithFine(userId, date));
+    }
+
+
     @GetMapping("/calculatematurity")
     public ResponseEntity<Double> calculateMaturity(
             @RequestParam double depositAmount,
